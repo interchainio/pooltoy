@@ -179,10 +179,14 @@ func NewInitApp(
 		keys[pooltoy.StoreKey],
 	)
 
+	bankModule := bank.NewAppModule(app.bankKeeper, app.accountKeeper)
+	restrictedBank := NewRestrictedBankModule(bankModule, app.bankKeeper, app.accountKeeper)
+
 	app.mm = module.NewManager(
 		genutil.NewAppModule(app.accountKeeper, app.stakingKeeper, app.BaseApp.DeliverTx),
 		auth.NewAppModule(app.accountKeeper),
-		bank.NewAppModule(app.bankKeeper, app.accountKeeper),
+		// bank.NewAppModule(app.bankKeeper, app.accountKeeper),
+		restrictedBank,
 		supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),

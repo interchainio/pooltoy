@@ -1,7 +1,10 @@
 package pooltoy
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 )
 
@@ -15,13 +18,33 @@ func handleMsgCreateUser(ctx sdk.Context, k Keeper, msg MsgCreateUser) (*sdk.Res
 		Email:       msg.Email,
 	}
 
+	allUsersRaw, err := k.ListUsers(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var allUsers []types.User
+	k.Cdc.MustUnmarshalJSON(allUsersRaw, &allUsers)
+
 	// does this creator have permission to create this new user?
+	// bare in mind special case allows create as initialization when there are no users yet
+	creator := k.GetUserByAccAddress(ctx, msg.Creator)
+	if creator.UserAccount.Empty() && len(allUsers) != 0 {
+		errMsg := fmt.Sprintf("user %s does not exist", msg.Creator)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
+	}
 
-	// if yes
-	k.CreateUser(ctx, user)
+	// TODO: check that new user doesn't exist already
 
-	// if no
-	// throw error
+	// special case allow create as initilization when there are no users yet
+	if creator.IsAdmin || len(allUsers) == 0 {
+		// if yes
+		k.CreateUser(ctx, user)
+	} else {
+		// if no
+		// throw error
+		errMsg := fmt.Sprintf("user %s (%s) is not an admin", creator.Name, msg.Creator)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
+	}
 
 	return &sdk.Result{Events: ctx.EventManager().Events()}, nil
 }

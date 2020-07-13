@@ -16,7 +16,7 @@ func NewQuerier(k Keeper) sdk.Querier {
 		switch path[0] {
 		// this line is used by starport scaffolding # 2
 		case types.QueryListUsers:
-			return listUsers(ctx, k)
+			return k.ListUsers(ctx)
 		default:
 			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, "unknown pooltoy query endpoint")
 		}

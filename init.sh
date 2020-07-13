@@ -8,6 +8,7 @@ pooltoycli config keyring-backend test
 
 pooltoycli keys add me
 pooltoycli keys add you
+pooltoycli keys add who
 
 pooltoyd add-genesis-account $(pooltoycli keys show me -a) 1000token,100000000stake
 pooltoyd add-genesis-account $(pooltoycli keys show you -a) 1token

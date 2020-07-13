@@ -1,6 +1,8 @@
 package app
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -30,11 +32,11 @@ func (am RestrictedBankModule) NewHandler() sdk.Handler {
 
 // RestrictedBankHandler routes the messages to the handlers
 func RestrictedBankHandler(k bank.Keeper, ak auth.AccountKeeper) sdk.Handler {
-
 	oldHandler := bank.NewHandler(k)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
 		ctx = ctx.WithEventManager(sdk.NewEventManager())
+		fmt.Println("new restricted bank handler getting used")
 
 		switch msg := msg.(type) {
 		case bank.MsgSend:
@@ -53,8 +55,10 @@ func RestrictedBankHandler(k bank.Keeper, ak auth.AccountKeeper) sdk.Handler {
 
 // Handle MsgSend.
 func handleMsgSend(ctx sdk.Context, k bank.Keeper, msg bank.MsgSend, ak auth.AccountKeeper, oldHandler sdk.Handler) (*sdk.Result, error) {
+	fmt.Println("new restricted bank handler handleMsgSend getting used - updated")
 
 	acc := ak.GetAccount(ctx, msg.ToAddress)
+	fmt.Println("this is the account", acc, msg.ToAddress)
 	if acc == nil {
 		return nil, sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s is not allowed to receive transactions", msg.ToAddress)
 	}

@@ -13,3 +13,8 @@ const (
 	// QuerierRoute to be used for querierer msgs
 	QuerierRoute = ModuleName
 )
+
+const (
+	UserPrefix = "user-"
+)
+		

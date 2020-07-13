@@ -38,3 +38,12 @@ type (
 
 	// TODO: Fill out module types
 )
+
+var (
+	NewMsgCreateUser = types.NewMsgCreateUser
+)
+
+type (
+	MsgCreateUser = types.MsgCreateUser
+)
+		

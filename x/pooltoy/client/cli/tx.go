@@ -23,6 +23,7 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 
 	pooltoyTxCmd.AddCommand(flags.PostCommands(
 	// this line is used by starport scaffolding
+		GetCmdCreateUser(cdc),
 	)...)
 
 	return pooltoyTxCmd

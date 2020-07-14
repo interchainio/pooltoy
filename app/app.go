@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"time"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -26,6 +27,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/interchainberlin/pooltoy/x/pooltoy"
+	"github.com/okwme/modules/incubator/faucet"
 )
 
 const appName = "app"
@@ -43,6 +45,7 @@ var (
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 		pooltoy.AppModuleBasic{},
+		faucet.AppModule{},
 	)
 
 	maccPerms = map[string][]string{
@@ -50,6 +53,7 @@ var (
 		distr.ModuleName:          nil,
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
+		faucet.ModuleName:         {supply.Minter},
 	}
 )
 
@@ -83,6 +87,7 @@ type NewApp struct {
 	supplyKeeper   supply.Keeper
 	paramsKeeper   params.Keeper
 	pooltoyKeeper  pooltoy.Keeper
+	faucetKeeper   faucet.Keeper
 
 	mm *module.Manager
 
@@ -179,6 +184,16 @@ func NewInitApp(
 		keys[pooltoy.StoreKey],
 	)
 
+	app.faucetKeeper = faucet.NewKeeper(
+		app.supplyKeeper,
+		app.stakingKeeper,
+		app.accountKeeper,
+		1,            // amount for mint
+		24*time.Hour, // rate limit by time
+		keys[faucet.StoreKey],
+		app.cdc,
+	)
+
 	bankModule := bank.NewAppModule(app.bankKeeper, app.accountKeeper)
 	restrictedBank := NewRestrictedBankModule(bankModule, app.bankKeeper, app.accountKeeper)
 
@@ -191,6 +206,7 @@ func NewInitApp(
 		distr.NewAppModule(app.distrKeeper, app.accountKeeper, app.supplyKeeper, app.stakingKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 		pooltoy.NewAppModule(app.pooltoyKeeper, app.bankKeeper),
+		faucet.NewAppModule(app.faucetKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
 	)

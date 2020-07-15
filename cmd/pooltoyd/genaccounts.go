@@ -11,8 +11,8 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -67,7 +67,6 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 
 				addr = info.GetAddress()
 			}
-
 			coins, err := sdk.ParseCoins(args[1])
 			if err != nil {
 				return fmt.Errorf("failed to parse coins: %w", err)

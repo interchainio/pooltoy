@@ -12,7 +12,7 @@ pooltoycli keys add carol
 pooltoycli keys add doug
 
 pooltoyd add-genesis-account $(pooltoycli keys show alice -a) 1000token,100000000stake
-# pooltoyd add-genesis-account $(pooltoycli keys show bob -a) 1token
+pooltoyd add-genesis-account $(pooltoycli keys show bob -a) 1token
 
 pooltoycli config chain-id pooltoy
 pooltoycli config output json

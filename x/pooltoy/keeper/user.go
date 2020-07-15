@@ -7,10 +7,18 @@ import (
 )
 
 func (k Keeper) CreateUser(ctx sdk.Context, user types.User) {
+
 	store := ctx.KVStore(k.storeKey)
 	key := []byte(types.UserPrefix + user.ID)
 	value := k.Cdc.MustMarshalBinaryLengthPrefixed(user)
 	store.Set(key, value)
+
+	acc := k.accountKeeper.GetAccount(ctx, user.UserAccount)
+	if acc == nil {
+		acc = k.accountKeeper.NewAccountWithAddress(ctx, user.UserAccount)
+		k.accountKeeper.SetAccount(ctx, acc)
+	}
+
 }
 
 func (k Keeper) GetUserByAccAddress(ctx sdk.Context, queriedUserAccAddress sdk.AccAddress) types.User {

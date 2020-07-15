@@ -20,3 +20,7 @@ require (
 	github.com/tendermint/tm-db v0.5.1
 	golang.org/x/net v0.0.0-20200520182314-0ba52f642ac2 // indirect
 )
+
+replace github.com/okwme/modules/incubator/faucet => /Users/billy/GitHub.com/okwme/modules/incubator/faucet
+
+replace github.com/cosmos/cosmos-sdk v0.38.4 => github.com/okwme/cosmos-sdk v0.38.5-0.20200715105500-2f18421bd970

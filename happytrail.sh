@@ -7,9 +7,12 @@
 
 pooltoycli tx pooltoy create-user $(pooltoycli keys show alice -a) true billy billy@interchain.berlin --from alice -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
 pooltoycli tx pooltoy create-user $(pooltoycli keys show bob -a) true sam sam@interchain.berlin --from alice -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
-pooltoycli tx pooltoy create-user $(pooltoycli keys show carol -a) false marko marko@interchain.berlin --from bob -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
+# pooltoycli tx pooltoy create-user $(pooltoycli keys show carol -a) false marko marko@interchain.berlin --from bob -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
+
+# this one should fail
+# pooltoycli tx pooltoy create-user $(pooltoycli keys show doug -a) false dieter dieter@interchain.berlin --from carol -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
 
 pooltoycli tx faucet mintfor $(pooltoycli keys show bob -a) 🚀 --from alice -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
-pooltoycli tx faucet mintfor $(pooltoycli keys show carol -a) 🌝 --from bob -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
-pooltoycli tx faucet mintfor $(pooltoycli keys show alice -a) 💸 --from carol -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
-pooltoycli tx faucet mintfor $(pooltoycli keys show alice -a) 💸 --from carol -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
+# pooltoycli tx faucet mintfor $(pooltoycli keys show carol -a) 🌝 --from bob -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
+# pooltoycli tx faucet mintfor $(pooltoycli keys show alice -a) 💸 --from carol -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx
+# pooltoycli tx faucet mintfor $(pooltoycli keys show alice -a) 💸 --from carol -y | jq ".txhash" |  xargs $(sleep 5) pooltoycli q tx

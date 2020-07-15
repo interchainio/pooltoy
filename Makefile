@@ -15,8 +15,8 @@ BUILD_FLAGS := -ldflags '$(ldflags)'
 all: install
 
 install: go.sum
-		go install -mod=readonly $(BUILD_FLAGS) -tags faucet ./cmd/pooltoyd
-		go install -mod=readonly $(BUILD_FLAGS) -tags faucet ./cmd/pooltoycli
+		go install -v -mod=readonly $(BUILD_FLAGS) -tags faucet ./cmd/pooltoyd
+		go install -v -mod=readonly $(BUILD_FLAGS) -tags faucet ./cmd/pooltoycli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"

@@ -7,24 +7,27 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 )
 
 // Keeper of the pooltoy store
 type Keeper struct {
-	CoinKeeper bank.Keeper
-	storeKey   sdk.StoreKey
-	Cdc        *codec.Codec
+	CoinKeeper    bank.Keeper
+	accountKeeper auth.AccountKeeper
+	storeKey      sdk.StoreKey
+	Cdc           *codec.Codec
 	// paramspace types.ParamSubspace
 }
 
 // NewKeeper creates a pooltoy keeper
-func NewKeeper(coinKeeper bank.Keeper, cdc *codec.Codec, key sdk.StoreKey) Keeper {
+func NewKeeper(coinKeeper bank.Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec, key sdk.StoreKey) Keeper {
 	keeper := Keeper{
-		CoinKeeper: coinKeeper,
-		storeKey:   key,
-		Cdc:        cdc,
+		CoinKeeper:    coinKeeper,
+		accountKeeper: accountKeeper,
+		storeKey:      key,
+		Cdc:           cdc,
 		// paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
 	}
 	return keeper

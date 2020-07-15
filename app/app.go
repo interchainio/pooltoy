@@ -107,7 +107,7 @@ func NewInitApp(
 	bApp.SetAppVersion(version.Version)
 
 	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, pooltoy.StoreKey)
+		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, pooltoy.StoreKey, faucet.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -180,6 +180,7 @@ func NewInitApp(
 
 	app.pooltoyKeeper = pooltoy.NewKeeper(
 		app.bankKeeper,
+		app.accountKeeper,
 		app.cdc,
 		keys[pooltoy.StoreKey],
 	)

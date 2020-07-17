@@ -17,6 +17,8 @@ pooltoycli tx pooltoy create-user $(pooltoycli keys show doug -a) false dieter d
 
 echo "alice mints 🚀 for bob"
 pooltoycli tx faucet mintfor $(pooltoycli keys show bob -a) 🚀 --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
+echo "should fail"
+pooltoycli tx faucet mintfor $(pooltoycli keys show carol -a) 🚀 --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
 echo "bob mints 🌝 for carol"
 pooltoycli tx faucet mintfor $(pooltoycli keys show carol -a) 🌝 --from bob -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
 echo "carol mints 💸 for alice"

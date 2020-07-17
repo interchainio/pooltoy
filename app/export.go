@@ -9,6 +9,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	dist "github.com/cosmos/cosmos-sdk/x/distribution/types"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 )
@@ -62,7 +63,7 @@ func (app *NewApp) prepForZeroHeightGenesis(ctx sdk.Context, jailWhiteList []str
 	// withdraw all validator commission
 	app.stakingKeeper.IterateValidators(ctx, func(_ int64, val staking.ValidatorI) (stop bool) {
 		_, err := app.distrKeeper.WithdrawValidatorCommission(ctx, val.GetOperator())
-		if err != nil {
+		if err != nil && err != dist.ErrNoValidatorCommission {
 			log.Fatal(err)
 		}
 		return false

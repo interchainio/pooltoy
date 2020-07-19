@@ -8,7 +8,7 @@ require (
 	github.com/golang/mock v1.4.3 // indirect
 	github.com/google/uuid v1.0.0
 	github.com/gorilla/mux v1.7.4
-	github.com/okwme/modules/incubator/faucet v0.0.0-20200719070953-137f89c90a7a
+	github.com/okwme/modules/incubator/faucet v0.0.0-20200719150004-606b92fc6e9c
 	github.com/onsi/ginkgo v1.8.0 // indirect
 	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
@@ -22,6 +22,7 @@ require (
 )
 
 // replace github.com/okwme/modules/incubator/faucet => /Users/billy/GitHub.com/okwme/modules/incubator/faucet
+
 replace github.com/cosmos/cosmos-sdk v0.38.4 => github.com/okwme/cosmos-sdk v0.38.5-0.20200715162801-4fd244eef297
 
 // replace github.com/cosmos/cosmos-sdk v0.38.4 => /Users/billy/GitHub.com/okwme/cosmos-sdk

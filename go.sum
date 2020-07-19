@@ -312,11 +312,10 @@ github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OS
 github.com/oklog/oklog v0.3.2/go.mod h1:FCV+B7mhrz4o+ueLpx+KqkyXRGMWOYEvfiXtdGtbWGs=
 github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQA=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
-github.com/okwme/cosmos-sdk v0.38.5-0.20200715154737-0cba060703e5 h1:0qXOlMTNJRtYiZZIH+BJqTJ+yhSpUjq7YzgFxZHlPEA=
-github.com/okwme/cosmos-sdk v0.38.5-0.20200715154737-0cba060703e5/go.mod h1:rzWOofbKfRt3wxiylmYWEFHnxxGj0coyqgWl2I9obAw=
+github.com/okwme/cosmos-sdk v0.38.5-0.20200715162801-4fd244eef297 h1:3EyTFkI6+Rt0dPksIDZgU9CFqF0fel4l/JHChZMDwu0=
 github.com/okwme/cosmos-sdk v0.38.5-0.20200715162801-4fd244eef297/go.mod h1:rzWOofbKfRt3wxiylmYWEFHnxxGj0coyqgWl2I9obAw=
-github.com/okwme/modules v0.0.0-20200715162926-d54381869a4a h1:czr3tLiKAt+KfQc06MprFBp2b5QGqY7lmsCFHVDLayI=
-github.com/okwme/modules v0.0.0-20200715162926-d54381869a4a/go.mod h1:MjcYzgp6eNScYW9NWrMh5v7NFUDM1NZgU4jlMG1wtFA=
+github.com/okwme/modules/incubator/faucet v0.0.0-20200719070953-137f89c90a7a h1:sPtaHYBPUv65Fr/BOaJAEZUcUqN6j2nkAY3hNKhbQk8=
+github.com/okwme/modules/incubator/faucet v0.0.0-20200719070953-137f89c90a7a/go.mod h1:oEDlEFIVVzJa6KQHMuQVfQvr1TgKwpc7TDfIhEnAKrY=
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=
 github.com/onsi/ginkgo v1.6.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=
 github.com/onsi/ginkgo v1.7.0/go.mod h1:lLunBs/Ym6LB5Z9jYTR76FiuTmxDTDusOGeTQH+WWjE=

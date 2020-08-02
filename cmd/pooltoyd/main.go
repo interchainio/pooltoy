@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
+	"regexp"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -32,6 +34,14 @@ var invCheckPeriod uint
 
 func main() {
 	cdc := app.MakeCodec()
+	reDnm := regexp.MustCompile(fmt.Sprintf(`^%s$`, reDnmString))
+
+	sdk.ValidateDenom = func(denom string) error {
+		if !reDnm.MatchString(denom) {
+			return fmt.Errorf("invalid denom: %s", denom)
+		}
+		return nil
+	}
 
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)

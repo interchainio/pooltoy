@@ -327,8 +327,6 @@ github.com/nats-io/nuid v1.0.1/go.mod h1:19wcPz3Ph3q0Jbyiqsd0kePYG7A95tJPxeL+1OS
 github.com/oklog/oklog v0.3.2/go.mod h1:FCV+B7mhrz4o+ueLpx+KqkyXRGMWOYEvfiXtdGtbWGs=
 github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQA=
 github.com/oklog/ulid v1.3.1/go.mod h1:CirwcVhetQ6Lv90oh/F+FBtV6XMibvdAFo93nm5qn4U=
-github.com/okwme/cosmos-sdk v0.38.6-0.20200802130156-46d1ad2d6210 h1:BgW4xcWgp+3IBP+9u348OSgZKVwYNEMWyJq8Zof+fkM=
-github.com/okwme/cosmos-sdk v0.38.6-0.20200802130156-46d1ad2d6210/go.mod h1:o5V2eXScgPWh8BkKr2Z2Zq+NEt1RFW8l1HBk87JG+PY=
 github.com/okwme/modules/incubator/faucet v0.0.0-20200719150004-606b92fc6e9c h1:BgaxmUWtKk70zYJ4R5SWkRMyN3yjc31Uqe1+bf4MlHc=
 github.com/okwme/modules/incubator/faucet v0.0.0-20200719150004-606b92fc6e9c/go.mod h1:oEDlEFIVVzJa6KQHMuQVfQvr1TgKwpc7TDfIhEnAKrY=
 github.com/olekukonko/tablewriter v0.0.0-20170122224234-a0225b3f23b5/go.mod h1:vsDQFd/mU46D+Z4whnwzcISnGGzXWMclvtLoiIKAKIo=

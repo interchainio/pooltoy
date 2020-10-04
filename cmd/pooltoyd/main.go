@@ -14,6 +14,7 @@ import (
 	dbm "github.com/tendermint/tm-db"
 
 	"github.com/interchainberlin/pooltoy/app"
+	"github.com/interchainberlin/pooltoy/validation"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client/debug"
@@ -33,16 +34,9 @@ var invCheckPeriod uint
 
 func main() {
 	cdc := app.MakeCodec()
-	// reDnm := regexp.MustCompile(fmt.Sprintf(`^%s$`, reDnmString))
 	sdk.CoinDenomRegex = func() string {
-		return reDnmString
+		return validation.ReDnmString
 	}
-	// sdk.ValidateDenom = func(denom string) error {
-	// 	if !reDnm.MatchString(denom) {
-	// 		return fmt.Errorf("invalid denom: %s", denom)
-	// 	}
-	// 	return nil
-	// }
 
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount(sdk.Bech32PrefixAccAddr, sdk.Bech32PrefixAccPub)

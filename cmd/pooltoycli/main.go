@@ -25,6 +25,7 @@ import (
 	"github.com/tendermint/tendermint/libs/cli"
 
 	"github.com/interchainberlin/pooltoy/app"
+	"github.com/interchainberlin/pooltoy/validation"
 )
 
 func main() {
@@ -40,6 +41,10 @@ func main() {
 	config.SetBech32PrefixForValidator(sdk.Bech32PrefixValAddr, sdk.Bech32PrefixValPub)
 	config.SetBech32PrefixForConsensusNode(sdk.Bech32PrefixConsAddr, sdk.Bech32PrefixConsPub)
 	config.Seal()
+
+	sdk.CoinDenomRegex = func() string {
+		return validation.ReDnmString
+	}
 
 	// TODO: setup keybase, viper object, etc. to be passed into
 	// the below functions and eliminate global vars, like we do

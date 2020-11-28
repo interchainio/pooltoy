@@ -36,10 +36,11 @@ func TestBasicMsg(t *testing.T) {
 	//Test for Creator who isn't an admin
 	TestUserAddress2 := GenerateTestAddress(3)
 	testMsg2 := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress2, false, "test_two", "test2@test.com")
-	creator := keeper.GetUserByAccAddress(ctx, TestCreatorAddress)
 	_, err2 := handler(ctx, testMsg2)
-	testErr1 := sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("user %s (%s) is not an admin", creator.Name, TestCreatorAddress))
 	require.Error(t, err2)
+
+	creator := keeper.GetUserByAccAddress(ctx, TestCreatorAddress)
+	testErr1 := sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("user %s (%s) is not an admin", creator.Name, TestCreatorAddress))
 	require.True(t, errors.Is(err2, testErr1))
 
 	//Test for non-existent Creator

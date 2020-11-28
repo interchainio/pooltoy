@@ -45,8 +45,9 @@ func TestBasicMsg(t *testing.T) {
 	//Test for non-existent Creator
 	testMsg3 := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress1, true, "test_three", "test3@test.com")
 	_, err3 := handler(ctx, testMsg3)
-	testErr2 := sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("user %s does not exist", TestCreatorAddress))
 	require.Error(t, err3)
+
+	testErr2 := sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("user %s does not exist", TestCreatorAddress))
 	require.True(t, errors.Is(err3, testErr2))
 
 	//Test for duplicate user TestUserAddress1 where creator is the user itself

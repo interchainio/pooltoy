@@ -2,7 +2,6 @@ package pooltoy
 
 import (
 	"fmt"
-	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -35,7 +34,7 @@ func handleMsgCreateUser(ctx sdk.Context, k Keeper, msg MsgCreateUser) (*sdk.Res
 	}
 
 	//  check that new user doesn't exist already
-	if existingUser := k.GetUserByAccAddress(ctx, msg.UserAccount); strings.Compare(existingUser.ID, msg.ID) == 0 {
+	if existingUser := k.GetUserByAccAddress(ctx, msg.UserAccount); existingUser.UserAccount.Equals(msg.UserAccount) {
 		errMsg := fmt.Sprintf("user %s already exists", msg.UserAccount)
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, errMsg)
 	}

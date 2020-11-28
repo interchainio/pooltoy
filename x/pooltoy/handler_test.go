@@ -20,21 +20,40 @@ func GenerateTestAddress(n byte) sdk.AccAddress {
 
 func TestBasicMsg(t *testing.T) {
 	keeper, ctx, _, _ := keeper.CreateTestKeepers(t)
+
+	//module github.com/cosmos/cosmos-sdk@latest found (v0.39.2), but does not contain package github.com/cosmos/cosmos-sdk/testutil/testdata
+	//Not sure what I am missing here
 	//msg := testdata.NewTestMsg()
 
+	//Test for first user creation
 	TestCreatorAddress := GenerateTestAddress(1)
-	TestUserAddress := GenerateTestAddress(2)
-	testMsg1 := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress, true, "test", "test@test.com")
-	handler1 := NewHandler(keeper)
-	_, err1 := handler1(ctx, testMsg1)
+	TestUserAddress1 := GenerateTestAddress(2)
+	testMsg1 := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress1, false, "test_one", "test1@test.com")
+	handler := NewHandler(keeper)
+	_, err1 := handler(ctx, testMsg1)
 	require.NoError(t, err1)
 
-	//TestCreator doesn't exist
-	testMsg2 := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress, true, "test", "test@test.com")
-	handler2 := NewHandler(keeper)
-	_, err2 := handler2(ctx, testMsg2)
-	errMsg := fmt.Sprintf("user %s does not exist", TestCreatorAddress)
-	testErr2 := sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
+	//Test for Creator who isn't an admin
+	TestUserAddress2 := GenerateTestAddress(3)
+	testMsg2 := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress2, false, "test_two", "test2@test.com")
+	creator := keeper.GetUserByAccAddress(ctx, TestCreatorAddress)
+	_, err2 := handler(ctx, testMsg2)
+	testErr1 := sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("user %s (%s) is not an admin", creator.Name, TestCreatorAddress))
 	require.Error(t, err2)
-	require.True(t, errors.Is(err2, testErr2))
+	require.True(t, errors.Is(err2, testErr1))
+
+	//Test for non-existent Creator
+	testMsg3 := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress1, true, "test_three", "test3@test.com")
+	_, err3 := handler(ctx, testMsg3)
+	testErr2 := sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("user %s does not exist", TestCreatorAddress))
+	require.Error(t, err3)
+	require.True(t, errors.Is(err3, testErr2))
+
+	//Test for duplicate user TestUserAddress1 where creator is the user itself
+	testMsg4 := types.NewMsgCreateUser(TestUserAddress1, TestUserAddress1, true, "test_one", "test1@test.com")
+	_, err4 := handler(ctx, testMsg4)
+	testErr3 := sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, fmt.Sprintf("user %s already exists", TestUserAddress1))
+	require.Error(t, err4)
+	require.True(t, errors.Is(err4, testErr3))
+
 }

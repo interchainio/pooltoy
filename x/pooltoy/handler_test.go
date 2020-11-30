@@ -20,16 +20,25 @@ func GenerateTestAddress(n byte) sdk.AccAddress {
 
 func TestBasicMsg(t *testing.T) {
 	keeper, ctx, _, _ := keeper.CreateTestKeepers(t)
+	handler := NewHandler(keeper)
 
 	//module github.com/cosmos/cosmos-sdk@latest found (v0.39.2), but does not contain package github.com/cosmos/cosmos-sdk/testutil/testdata
 	//Not sure what I am missing here
 	//msg := testdata.NewTestMsg()
 
-	//Test for first user creation
+	//Test for first user creation when creator is not an admin
 	TestCreatorAddress := GenerateTestAddress(1)
 	TestUserAddress1 := GenerateTestAddress(2)
-	testMsg1 := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress1, false, "test_one", "test1@test.com")
-	handler := NewHandler(keeper)
+	testMsg := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress1, false, "test_one", "test1@test.com")
+	_, err := handler(ctx, testMsg)
+	require.Error(t, err)
+
+	creator := keeper.GetUserByAccAddress(ctx, TestCreatorAddress)
+	testErr := sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("user %s (%s) is not an admin", creator.Name, TestCreatorAddress))
+	require.True(t, errors.Is(err, testErr))
+
+	//Test for first  user creation
+	testMsg1 := types.NewMsgCreateUser(TestCreatorAddress, TestUserAddress1, true, "test_one", "test1@test.com")
 	_, err1 := handler(ctx, testMsg1)
 	require.NoError(t, err1)
 
@@ -39,7 +48,7 @@ func TestBasicMsg(t *testing.T) {
 	_, err2 := handler(ctx, testMsg2)
 	require.Error(t, err2)
 
-	creator := keeper.GetUserByAccAddress(ctx, TestCreatorAddress)
+	creator = keeper.GetUserByAccAddress(ctx, TestCreatorAddress)
 	testErr1 := sdkerrors.Wrap(sdkerrors.ErrUnauthorized, fmt.Sprintf("user %s (%s) is not an admin", creator.Name, TestCreatorAddress))
 	require.True(t, errors.Is(err2, testErr1))
 

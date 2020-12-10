@@ -11,26 +11,26 @@ import (
 func TestValidateGenesis(t *testing.T) {
 
 	testUsers := []User{
-		User{},
+		{},
 
-		User{
+		{
 			Creator:     bytes.Repeat([]byte{1}, sdk.AddrLen),
 			UserAccount: bytes.Repeat([]byte{2}, sdk.AddrLen),
 			IsAdmin:     false,
 		},
 
-		User{
+		{
 			Creator:     bytes.Repeat([]byte{3}, sdk.AddrLen),
 			UserAccount: bytes.Repeat([]byte{4}, sdk.AddrLen),
 			IsAdmin:     true,
 		},
 
-		User{
+		{
 			Creator: bytes.Repeat([]byte{3}, sdk.AddrLen),
 			IsAdmin: true,
 		},
 
-		User{
+		{
 			UserAccount: bytes.Repeat([]byte{4}, sdk.AddrLen),
 			IsAdmin:     true,
 		},
@@ -47,27 +47,22 @@ func TestValidateGenesis(t *testing.T) {
 		},
 		{
 			desc:        "Empty user and creator",
-			genesis:     NewGenesisState(testUsers[0]),
-			shouldError: true,
-		},
-		{
-			desc:        "Creator is not an admin",
-			genesis:     NewGenesisState(testUsers[1]),
+			genesis:     NewGenesisState([]User{testUsers[0]}),
 			shouldError: true,
 		},
 		{
 			desc:        "Legit user",
-			genesis:     NewGenesisState(testUsers[2]),
+			genesis:     NewGenesisState([]User{testUsers[2]}),
 			shouldError: false,
 		},
 		{
 			desc:        "Empty user",
-			genesis:     NewGenesisState(testUsers[3]),
+			genesis:     NewGenesisState([]User{testUsers[3]}),
 			shouldError: true,
 		},
 		{
 			desc:        "Empty creator",
-			genesis:     NewGenesisState(testUsers[4]),
+			genesis:     NewGenesisState([]User{testUsers[4]}),
 			shouldError: true,
 		},
 	}

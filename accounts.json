@@ -30,9 +30,6 @@
             "amount": "1⌨️"
           },
           {
-            "amount": "1☕️"
-          },
-          {
             "amount": "1⚰️"
           },
           {
@@ -196,9 +193,6 @@
         "coins": [
           {
             "amount": "1☕"
-          },
-          {
-            "amount": "1☕️"
           },
           {
             "amount": "1🌔"
@@ -520,9 +514,6 @@
         "account_number": "20",
         "address": "cosmos13rwxj6g29kvg46rjqarvdj0cn0zxvw8s5f0zgl",
         "coins": [
-          {
-            "amount": "1☕️"
-          },
           {
             "amount": "1🍕"
           },

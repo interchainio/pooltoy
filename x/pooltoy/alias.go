@@ -46,4 +46,3 @@ var (
 type (
 	MsgCreateUser = types.MsgCreateUser
 )
-		

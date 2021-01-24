@@ -33,10 +33,14 @@ func handleMsgCreateUser(ctx sdk.Context, k Keeper, msg MsgCreateUser) (*sdk.Res
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
 	}
 
-	// TODO: check that new user doesn't exist already
+	//  check that new user doesn't exist already
+	if existingUser := k.GetUserByAccAddress(ctx, msg.UserAccount); existingUser.UserAccount.Equals(msg.UserAccount) {
+		errMsg := fmt.Sprintf("user %s already exists", msg.UserAccount)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, errMsg)
+	}
 
-	// special case allow create as initilization when there are no users yet
-	if creator.IsAdmin || len(allUsers) == 0 {
+	// creator must be an admin
+	if creator.IsAdmin || (msg.IsAdmin && len(allUsers) == 0) {
 		// if yes
 		k.CreateUser(ctx, user)
 	} else {

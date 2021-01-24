@@ -224,8 +224,8 @@ func NewInitApp(
 
 		// app.stakingKeeper.SetDelegation(ctx, delegation)
 
-		// votingParams := gov.NewVotingParams(6000000000)
-		// app.paramsKeeper.Subspace(gov.DefaultParamspace).Set(ctx, gov.ParamStoreKeyVotingParams, &votingParams)
+		votingParams := gov.NewVotingParams(6000000000)
+		app.paramsKeeper.Subspace(gov.DefaultParamspace).Set(ctx, gov.ParamStoreKeyVotingParams, &votingParams)
 	})
 
 	app.pooltoyKeeper = pooltoy.NewKeeper(

@@ -22,6 +22,12 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/bank"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
+	"github.com/cosmos/cosmos-sdk/x/gov"
+
+	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
+	"github.com/cosmos/cosmos-sdk/x/upgrade"
+	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
+
 	"github.com/cosmos/cosmos-sdk/x/params"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 	"github.com/cosmos/cosmos-sdk/x/staking"
@@ -41,7 +47,12 @@ var (
 		bank.AppModuleBasic{},
 		staking.AppModuleBasic{},
 		distr.AppModuleBasic{},
+
+		gov.NewAppModuleBasic(
+			paramsclient.ProposalHandler, distr.ProposalHandler, upgradeclient.ProposalHandler,
+		),
 		params.AppModuleBasic{},
+		upgrade.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		supply.AppModuleBasic{},
 		pooltoy.AppModuleBasic{},
@@ -53,6 +64,7 @@ var (
 		distr.ModuleName:          nil,
 		staking.BondedPoolName:    {supply.Burner, supply.Staking},
 		staking.NotBondedPoolName: {supply.Burner, supply.Staking},
+		gov.ModuleName:            {supply.Burner},
 		faucet.ModuleName:         {supply.Minter},
 	}
 )
@@ -83,11 +95,14 @@ type NewApp struct {
 	bankKeeper     bank.Keeper
 	stakingKeeper  staking.Keeper
 	slashingKeeper slashing.Keeper
-	distrKeeper    distr.Keeper
-	supplyKeeper   supply.Keeper
-	paramsKeeper   params.Keeper
-	pooltoyKeeper  pooltoy.Keeper
-	faucetKeeper   faucet.Keeper
+	govKeeper      gov.Keeper
+	upgradeKeeper  upgrade.Keeper
+
+	distrKeeper   distr.Keeper
+	supplyKeeper  supply.Keeper
+	paramsKeeper  params.Keeper
+	pooltoyKeeper pooltoy.Keeper
+	faucetKeeper  faucet.Keeper
 
 	mm *module.Manager
 
@@ -98,7 +113,7 @@ var _ simapp.App = (*NewApp)(nil)
 
 func NewInitApp(
 	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
-	invCheckPeriod uint, baseAppOptions ...func(*bam.BaseApp),
+	invCheckPeriod uint, skipUpgradeHeights map[int64]bool, baseAppOptions ...func(*bam.BaseApp),
 ) *NewApp {
 	cdc := MakeCodec()
 
@@ -106,8 +121,18 @@ func NewInitApp(
 	bApp.SetCommitMultiStoreTracer(traceStore)
 	bApp.SetAppVersion(version.Version)
 
-	keys := sdk.NewKVStoreKeys(bam.MainStoreKey, auth.StoreKey, staking.StoreKey,
-		supply.StoreKey, distr.StoreKey, slashing.StoreKey, params.StoreKey, pooltoy.StoreKey, faucet.StoreKey)
+	keys := sdk.NewKVStoreKeys(
+		bam.MainStoreKey,
+		auth.StoreKey,
+		staking.StoreKey,
+		supply.StoreKey,
+		distr.StoreKey,
+		slashing.StoreKey,
+		params.StoreKey,
+		gov.StoreKey,
+		upgrade.StoreKey,
+		pooltoy.StoreKey,
+		faucet.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(staking.TStoreKey, params.TStoreKey)
 
@@ -178,6 +203,31 @@ func NewInitApp(
 			app.slashingKeeper.Hooks()),
 	)
 
+	app.upgradeKeeper = upgrade.NewKeeper(skipUpgradeHeights, keys[upgrade.StoreKey], cdc)
+
+	// no-op handler for "nextversion" upgrade
+	app.upgradeKeeper.SetUpgradeHandler("nextversion", func(ctx sdk.Context, plan upgrade.Plan) {
+		// faucetAddr, _ := sdk.AccAddressFromBech32("akash1dz70tfxxrsh8fned6len7feu3atz7k59zgz77n")
+		// personalAcc1, _ := sdk.AccAddressFromBech32("akash1dz70tfxxrsh8fned6len7feu3atz7k59zgz77n")
+		// personalAcc2, _ := sdk.AccAddressFromBech32("akash1y4uskp4v6s086pdg6phufqcg82g9xd494kdwmn")
+		// valAddr, _ := sdk.ValAddressFromBech32("akashvaloper1753ew9z7cfhu6awyp6ff7qtm9ex30kg3r7zd7j")
+
+		// _, _ = app.bankKeeper.AddCoins(ctx, faucetAddr, sdk.Coins{sdk.Coin{Denom: "uakt", Amount: sdk.NewInt(10000000000)}})
+		// _, _ = app.bankKeeper.AddCoins(ctx, personalAcc1, sdk.Coins{sdk.Coin{Denom: "uakt", Amount: sdk.NewInt(10000000000)}})
+		// _, _ = app.bankKeeper.AddCoins(ctx, personalAcc2, sdk.Coins{sdk.Coin{Denom: "uakt", Amount: sdk.NewInt(10000000000)}})
+
+		// delegation := stakingTypes.Delegation{
+		// 	DelegatorAddress: faucetAddr,
+		// 	ValidatorAddress: valAddr,
+		// 	Shares:           sdk.NewDec(100000000000),
+		// }
+
+		// app.stakingKeeper.SetDelegation(ctx, delegation)
+
+		votingParams := gov.NewVotingParams(6000000000)
+		app.paramsKeeper.Subspace(gov.DefaultParamspace).Set(ctx, gov.ParamStoreKeyVotingParams, &votingParams)
+	})
+
 	app.pooltoyKeeper = pooltoy.NewKeeper(
 		app.bankKeeper,
 		app.accountKeeper,
@@ -195,6 +245,22 @@ func NewInitApp(
 		app.cdc,
 	)
 
+	// register the proposal types
+	govRouter := gov.NewRouter()
+	govRouter.AddRoute(gov.RouterKey, gov.ProposalHandler).
+		AddRoute(params.RouterKey, params.NewParamChangeProposalHandler(app.paramsKeeper)).
+		AddRoute(distr.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.distrKeeper)).
+		AddRoute(upgrade.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.upgradeKeeper))
+
+	app.govKeeper = gov.NewKeeper(
+		cdc,
+		keys[gov.StoreKey],
+		app.paramsKeeper.Subspace(gov.DefaultParamspace).WithKeyTable(gov.ParamKeyTable()),
+		app.supplyKeeper,
+		&stakingKeeper,
+		govRouter,
+	)
+
 	bankModule := bank.NewAppModule(app.bankKeeper, app.accountKeeper)
 	restrictedBank := NewRestrictedBankModule(bankModule, app.bankKeeper, app.accountKeeper)
 
@@ -210,10 +276,12 @@ func NewInitApp(
 		faucet.NewAppModule(app.faucetKeeper),
 		staking.NewAppModule(app.stakingKeeper, app.accountKeeper, app.supplyKeeper),
 		slashing.NewAppModule(app.slashingKeeper, app.accountKeeper, app.stakingKeeper),
+		gov.NewAppModule(app.govKeeper, app.accountKeeper, app.supplyKeeper),
+		upgrade.NewAppModule(app.upgradeKeeper),
 	)
 
-	app.mm.SetOrderBeginBlockers(distr.ModuleName, slashing.ModuleName)
-	app.mm.SetOrderEndBlockers(staking.ModuleName)
+	app.mm.SetOrderBeginBlockers(upgrade.ModuleName, distr.ModuleName, slashing.ModuleName)
+	app.mm.SetOrderEndBlockers(staking.ModuleName, gov.ModuleName)
 
 	app.mm.SetOrderInitGenesis(
 		distr.ModuleName,
@@ -221,6 +289,7 @@ func NewInitApp(
 		auth.ModuleName,
 		bank.ModuleName,
 		slashing.ModuleName,
+		gov.ModuleName,
 		pooltoy.ModuleName,
 		supply.ModuleName,
 		genutil.ModuleName,

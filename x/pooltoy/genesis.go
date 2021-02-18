@@ -5,13 +5,14 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
+	"github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 	// abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // InitGenesis initialize default parameters
 // and the keeper's address to pubkey map
-func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
+func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	var oneAdmin = false
 	for _, user := range data.Users {
 		if user.IsAdmin {
@@ -27,7 +28,7 @@ func InitGenesis(ctx sdk.Context, k Keeper, data GenesisState) {
 // ExportGenesis writes the current store values
 // to a genesis file, which can be imported again
 // with InitGenesis
-func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
+func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 	allUsersRaw, err := k.ListUsers(ctx)
 	if err != nil {
 		fmt.Println(err)
@@ -60,7 +61,7 @@ func ExportGenesis(ctx sdk.Context, k Keeper) GenesisState {
 		}
 	}
 
-	return NewGenesisState(allUsers)
+	return types.NewGenesisState(allUsers)
 }
 
 // "gov": {

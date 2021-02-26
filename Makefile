@@ -1,5 +1,5 @@
 PACKAGES=$(shell go list ./... | grep -v '/simulation')
-
+DOCKER := $(shell which docker)
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 
@@ -31,3 +31,9 @@ lint:
 	@echo "--> Running linter"
 	@golangci-lint run
 	@go mod verify
+.PHONY: lint
+
+proto-gen:
+	@echo "Generating Protobuf files"
+	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen sh ./scripts/protocgen.sh
+.PHONY: proto-gen

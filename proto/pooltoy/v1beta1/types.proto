@@ -13,7 +13,7 @@ message MsgCreateUser {
   string user_account = 3 [(gogoproto.moretags) = "yaml:\"userAccount\""];
   bool   is_admin     = 4 [(gogoproto.moretags) = "yaml:\"isAdmin\""];
   string name         = 5 [(gogoproto.moretags) = "yaml:\"name\""];
-  string email        = 4 [(gogoproto.moretags) = "yaml:\"email\""];
+  string email        = 6 [(gogoproto.moretags) = "yaml:\"email\""];
 }
 
 message User {
@@ -24,10 +24,6 @@ message User {
   string name         = 5 [(gogoproto.moretags) = "yaml:\"name\""];
   string email        = 6 [(gogoproto.moretags) = "yaml:\"email\""];
 }
-
-// type GenesisState struct {
-// 	Users []User
-// }
 
 message GenesisState {
   repeated User user = 1 [(gogoproto.moretags) = "yaml:\"user\""];

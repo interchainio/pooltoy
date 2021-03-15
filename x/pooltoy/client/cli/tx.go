@@ -7,12 +7,11 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 )
 
 // GetTxCmd returns the transaction commands for this module
-func GetTxCmd(cdc *codec.Codec) *cobra.Command {
+func GetTxCmd() *cobra.Command {
 	pooltoyTxCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      fmt.Sprintf("%s transactions subcommands", types.ModuleName),
@@ -21,8 +20,12 @@ func GetTxCmd(cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
+	pooltoyTxCmd.AddCommand(
+		
+	)
+
 	pooltoyTxCmd.AddCommand(flags.PostCommands(
-	// this line is used by starport scaffolding
+		// this line is used by starport scaffolding
 		GetCmdCreateUser(cdc),
 	)...)
 

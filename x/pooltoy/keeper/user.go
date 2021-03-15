@@ -9,14 +9,14 @@ import (
 func (k Keeper) CreateUser(ctx sdk.Context, user types.User) {
 
 	store := ctx.KVStore(k.storeKey)
-	key := []byte(types.UserPrefix + user.ID)
+	key := []byte(types.UserPrefix + user.Id)
 	value := k.Cdc.MustMarshalBinaryLengthPrefixed(user)
 	store.Set(key, value)
 
-	acc := k.accountKeeper.GetAccount(ctx, user.UserAccount)
+	acc := k.AccountKeeper.GetAccount(ctx, user.UserAccount)
 	if acc == nil {
-		acc = k.accountKeeper.NewAccountWithAddress(ctx, user.UserAccount)
-		k.accountKeeper.SetAccount(ctx, acc)
+		acc = k.AccountKeeper.NewAccountWithAddress(ctx, user.UserAccount)
+		k.AccountKeeper.SetAccount(ctx, acc)
 	}
 
 }
@@ -29,7 +29,7 @@ func (k Keeper) GetUserByAccAddress(ctx sdk.Context, queriedUserAccAddress sdk.A
 	iterator := sdk.KVStorePrefixIterator(store, []byte(types.UserPrefix))
 	for ; iterator.Valid(); iterator.Next() {
 		var user types.User
-		k.Cdc.MustUnmarshalBinaryLengthPrefixed(store.Get(iterator.Key()), &user)
+		k.cdc.MustUnmarshalBinaryLengthPrefixed(store.Get(iterator.Key()), &user)
 		if user.UserAccount.Equals(queriedUserAccAddress) {
 			queriedUser = user
 		}

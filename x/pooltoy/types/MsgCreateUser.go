@@ -3,37 +3,33 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/google/uuid"
+)
+
+// msg types
+const (
+	TypeMsgCreateUser = "create-user"
 )
 
 var _ sdk.Msg = &MsgCreateUser{}
 
-type MsgCreateUser struct {
-	ID          string
-	Creator     sdk.AccAddress `json:"creator" yaml:"creator"`
-	UserAccount sdk.AccAddress `json:"userAccount" yaml:"userAccount"`
-	IsAdmin     bool           `json:"isAdmin" yaml:"isAdmin"`
-	Name        string         `json:"name" yaml:"name"`
-	Email       string         `json:"email" yaml:"email"`
-}
-
-func NewMsgCreateUser(creator sdk.AccAddress, userAccount sdk.AccAddress, isAdmin bool, name string, email string) MsgCreateUser {
-	return MsgCreateUser{
-		ID:          uuid.New().String(),
-		Creator:     creator,
-		UserAccount: userAccount,
-		IsAdmin:     isAdmin,
-		Name:        name,
-		Email:       email,
+func NewMsgCreateUser(
+	usr User,
+	creator string,
+) *MsgCreateUser {
+	return &MsgCreateUser{
+		User:    &usr,
+		Creator: creator,
 	}
 }
 
-func (msg MsgCreateUser) Route() string {
+// Route implements sdk.Msg
+func (MsgCreateUser) Route() string {
 	return RouterKey
 }
 
-func (msg MsgCreateUser) Type() string {
-	return "CreateUser"
+// Type implements sdk.Msg
+func (MsgCreateUser) Type() string {
+	return TypeMsgCreateUser
 }
 
 func (msg MsgCreateUser) GetSigners() []sdk.AccAddress {
@@ -41,15 +37,14 @@ func (msg MsgCreateUser) GetSigners() []sdk.AccAddress {
 }
 
 func (msg MsgCreateUser) GetSignBytes() []byte {
-	bz := ModuleCdc.MustMarshalJSON(msg)
-	return sdk.MustSortJSON(bz)
+	panic("pooltoy has deprecated amino")
 }
 
 func (msg MsgCreateUser) ValidateBasic() error {
-	if msg.Creator.Empty() {
+	if msg.Creator == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "creator can't be empty")
 	}
-	if msg.UserAccount.Empty() {
+	if msg.UserAccount == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "UserAccount can't be empty")
 	}
 	if msg.Name == "" {

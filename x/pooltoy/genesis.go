@@ -14,14 +14,15 @@ import (
 // and the keeper's address to pubkey map
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	var oneAdmin = false
-	for _, user := range data.Users {
-		if user.IsAdmin {
+	for _, u := range data.User {
+		if u.IsAdmin {
 			oneAdmin = true
 		}
-		k.CreateUser(ctx, user)
+		k.CreateUser(ctx, *u)
 	}
 	if !oneAdmin {
-		k.CreateUser(ctx, types.MakeAdmin())
+		a := types.MakeAdmin()
+		k.CreateUser(ctx, *a)
 	}
 }
 
@@ -34,34 +35,35 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 		fmt.Println(err)
 		panic(err)
 	}
-	var allUsers []types.User
-	k.Cdc.MustUnmarshalJSON(allUsersRaw, &allUsers)
+	var users []*types.User
+	k.cdc.MustUnmarshalJSON(allUsersRaw, &users)
 
 	// chain got into a state such that there were accounts with no corresponding users.
 	// ideally this would never happen but as it is currently the case these users need to be manually created.
 	allAccounts := k.ListAccounts(ctx)
-	if len(allAccounts) != len(allUsers) {
+	if len(allAccounts) != len(users) {
 		for _, acct := range allAccounts {
 			found := false
-			for _, user := range allUsers {
-				if user.UserAccount.Equals(acct.GetAddress()) {
+			for _, u := range users {
+				a := acct.GetAddress
+				if u.UserAccount == a {
 					found = true
 				}
 			}
 			if !found {
-				var newUser = types.User{
+				n := types.User{
 					UserAccount: acct.GetAddress(),
 					IsAdmin:     false,
-					ID:          uuid.New().String(),
+					Id:          uuid.New().String(),
 					Name:        "",
 					Email:       "",
 				}
-				allUsers = append(allUsers, newUser)
+				users = append(users, &n)
 			}
 		}
 	}
 
-	return types.NewGenesisState(allUsers)
+	return types.NewGenesisState(users)
 }
 
 // "gov": {

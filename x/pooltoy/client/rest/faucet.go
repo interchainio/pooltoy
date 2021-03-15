@@ -7,16 +7,16 @@ import (
 	"net/http"
 	"os/exec"
 
-	"github.com/cosmos/cosmos-sdk/client/context"
+	"github.com/cosmos/cosmos-sdk/client"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
-	"github.com/tendermint/tendermint/libs/bech32"
 )
 
 type claimReq struct {
 	Address string
 }
 
-func faucetHandler(cliCtx context.CLIContext) http.HandlerFunc {
+func faucetHandler(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var claim claimReq
 		decoder := json.NewDecoder(r.Body)
@@ -25,20 +25,15 @@ func faucetHandler(cliCtx context.CLIContext) http.HandlerFunc {
 			panic(decoderErr)
 		}
 		// make sure address is bech32
-		readableAddress, decodedAddress, decodeErr := bech32.DecodeAndConvert(claim.Address)
-		if decodeErr != nil {
-			panic(decodeErr)
-		}
-		// re-encode the address in bech32
-		encodedAddress, encodeErr := bech32.ConvertAndEncode(readableAddress, decodedAddress)
-		if encodeErr != nil {
-			panic(encodeErr)
-		}
-		cmd := exec.Command("pooltoycli", "tx", "send", "me", encodedAddress, "1token", "-y")
-		_, err := cmd.Output()
+		_, err := sdk.GetPubKeyFromBech32(sdk.Bech32PubKeyTypeAccPub, claim.Address)
 		if err != nil {
 			log.Fatal(fmt.Sprintf("%s", err))
 		}
-		rest.PostProcessResponse(w, cliCtx, encodedAddress)
+		cmd := exec.Command("pooltoycli", "tx", "send", "me", claim.Address, "1token", "-y")
+		_, err = cmd.Output()
+		if err != nil {
+			log.Fatal(fmt.Sprintf("%s", err))
+		}
+		rest.PostProcessResponse(w, cliCtx, claim.Address)
 	}
 }

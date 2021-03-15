@@ -3,35 +3,37 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/exported"
-	"github.com/cosmos/cosmos-sdk/x/bank"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
 
 // Keeper of the pooltoy store
 type Keeper struct {
-	CoinKeeper    bank.Keeper
-	accountKeeper auth.AccountKeeper
-	storeKey      sdk.StoreKey
-	Cdc           *codec.Codec
+	Cdc      codec.BinaryMarshaler
+	StoreKey sdk.StoreKey
+
+	CoinKeeper    types.BankKeeper
+	AccountKeeper types.AccountKeeper
 	// paramspace types.ParamSubspace
 }
 
 // NewKeeper creates a pooltoy keeper
-func NewKeeper(coinKeeper bank.Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec, key sdk.StoreKey) Keeper {
-	keeper := Keeper{
+func NewKeeper(
+	cdc codec.BinaryMarshaler,
+	key sdk.StoreKey,
+
+	coinKeeper types.BankKeeper,
+	accountKeeper types.AccountKeeper,
+) Keeper {
+	return Keeper{
+		Cdc:      cdc,
+		StoreKey: key,
+
 		CoinKeeper:    coinKeeper,
-		accountKeeper: accountKeeper,
-		storeKey:      key,
-		Cdc:           cdc,
-		// paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
+		AccountKeeper: accountKeeper,
 	}
-	return keeper
 }
 
 // Logger returns a module-specific logger.
@@ -39,9 +41,10 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) ListAccounts(ctx sdk.Context) []exported.Account {
-	return k.accountKeeper.GetAllAccounts(ctx)
-}
+// TODO: check out where accounts are now
+// func (k Keeper) ListAccounts(ctx sdk.Context) []exported.Account {
+// 	return k.AccountKeeper.GetAllAccounts(ctx)
+// }
 
 // Get returns the pubkey from the adddress-pubkey relation
 // func (k Keeper) Get(ctx sdk.Context, key string) (/* TODO: Fill out this type */, error) {

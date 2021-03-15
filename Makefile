@@ -1,5 +1,6 @@
 PACKAGES=$(shell go list ./... | grep -v '/simulation')
 DOCKER := $(shell which docker)
+DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 
@@ -15,8 +16,8 @@ BUILD_FLAGS := -ldflags '$(ldflags)'
 all: install
 
 install: go.sum
-		go install -v -mod=readonly $(BUILD_FLAGS) -tags faucet ./cmd/pooltoyd
-		go install -v -mod=readonly $(BUILD_FLAGS) -tags faucet ./cmd/pooltoycli
+		go install $(BUILD_FLAGS) ./cmd/pooltoyd
+		go install $(BUILD_FLAGS) ./cmd/pooltoycli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"
@@ -33,7 +34,21 @@ lint:
 	@go mod verify
 .PHONY: lint
 
+#PROTOBUF
+
+proto-all: proto-format proto-lint proto-gen
+
 proto-gen:
 	@echo "Generating Protobuf files"
-	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen sh ./scripts/protocgen.sh
-.PHONY: proto-gen
+	$(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace tendermintdev/sdk-proto-gen:v0.1 sh ./scripts/protocgen.sh
+
+proto-format:
+	@echo "Formatting Protobuf files"
+	$(DOCKER) run --rm -v $(CURDIR):/workspace \
+	--workdir /workspace tendermintdev/docker-build-proto \
+	find ./ -not -path "./third_party/*" -name *.proto -exec clang-format -i {} \;
+
+proto-lint:
+	@$(DOCKER_BUF) check lint --error-format=json
+
+.PHONY: proto-all proto-gen proto-format proto-lint

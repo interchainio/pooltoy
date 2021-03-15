@@ -16,7 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/staking"
 	"github.com/cosmos/cosmos-sdk/x/supply"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
-	"github.com/okwme/modules/incubator/faucet"
+	// "github.com/okwme/modules/incubator/faucet"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"

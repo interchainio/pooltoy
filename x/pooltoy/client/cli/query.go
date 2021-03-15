@@ -10,14 +10,14 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
 	// "github.com/cosmos/cosmos-sdk/client/context"
-	"github.com/cosmos/cosmos-sdk/codec"
+
 	// sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module
-func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
+func GetQueryCmd() *cobra.Command {
 	// Group pooltoy queries under a subcommand
 	pooltoyQueryCmd := &cobra.Command{
 		Use:                        types.ModuleName,
@@ -27,12 +27,7 @@ func GetQueryCmd(queryRoute string, cdc *codec.Codec) *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	pooltoyQueryCmd.AddCommand(
-		flags.GetCommands(
-			// this line is used by starport scaffolding
-			GetCmdListUsers(queryRoute, cdc),
-		)...,
-	)
+	flags.AddQueryFlagsToCmd(pooltoyQueryCmd)
 
 	return pooltoyQueryCmd
 }

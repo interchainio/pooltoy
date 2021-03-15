@@ -13,25 +13,18 @@ protoc_gen_gocosmos() {
 
 protoc_gen_gocosmos
 
-echo "HEY!"
 proto_dirs=$(find ./proto -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
 
 echo $proto_dirs
-# for dir in $proto_dirs; do
-#   buf protoc \
-#   -I "proto" \
-#   -I "third_party/proto" \
-#   --gocosmos_out=plugins=interfacetype+grpc,\
-# Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
-#   $(find "${dir}" -name '*.proto')
+for dir in $proto_dirs; do
+  buf protoc \
+  -I "proto" \
+  -I "third_party/proto" \
+  --gocosmos_out=plugins=interfacetype+grpc,\
+Mgoogle/protobuf/any.proto=github.com/cosmos/cosmos-sdk/codec/types:. \
+  $(find "${dir}" -name '*.proto')
 
-#    buf protoc \
-#   -I "proto" \
-#   -I="third_party/proto" \
-#   -I="proto" \
-#   --grpc-gateway_out=logtostderr=true:. \
-#   $(find "${dir}" -maxdepth 1 -name '*.proto')
-# done
+done
 
 # TODO: fix doc gen
 # command to generate docs using protoc-gen-doc
@@ -44,5 +37,5 @@ echo $proto_dirs
 # go mod tidy
 
 # move proto files to the right places
-# cp -r github.com/interchainberlin/pooltoy/* ./
-# rm -rf github.com
+cp -r github.com/interchainberlin/pooltoy/* ./
+rm -rf github.com

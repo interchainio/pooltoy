@@ -1,4 +1,4 @@
-package pooltoy
+package keeper
 
 import (
 	"fmt"
@@ -10,13 +10,14 @@ import (
 )
 
 func handleMsgCreateUser(ctx sdk.Context, k keeper.Keeper, msg types.MsgCreateUser) (*sdk.Result, error) {
+	u := msg.User
 	var user = types.User{
 		Creator:     msg.Creator,
-		UserAccount: msg.UserAccount,
-		IsAdmin:     msg.IsAdmin,
-		ID:          msg.ID,
-		Name:        msg.Name,
-		Email:       msg.Email,
+		UserAccount: u.UserAccount,
+		IsAdmin:     u.IsAdmin,
+		Id:          u.Id,
+		Name:        u.Name,
+		Email:       u.Email,
 	}
 
 	allUsersRaw, err := k.ListUsers(ctx)

@@ -44,11 +44,8 @@ func (msg MsgCreateUser) ValidateBasic() error {
 	if msg.Creator == "" {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "creator can't be empty")
 	}
-	if msg.UserAccount == "" {
+	if (User{} == *msg.User) {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, "UserAccount can't be empty")
-	}
-	if msg.Name == "" {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "Name can't be empty")
 	}
 	return nil
 }

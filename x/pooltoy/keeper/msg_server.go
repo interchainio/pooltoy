@@ -1,47 +1,39 @@
 package keeper
 
-import (
-	"context"
+// import (
+// 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
+// )
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/interchainberlin/pooltoy/x/types"
-)
+// type msgServer struct {
+// 	Keeper
+// }
 
-type msgServer struct {
-	Keeper
-}
+// // NewMsgServerImpl returns an implementation of the MsgServer interface
+// // for the provided Keeper.
+// func NewMsgServerImpl(keeper Keeper) types.MsgServer {
+// 	return &msgServer{Keeper: keeper}
+// }
 
-// NewMsgServerImpl returns an implementation of the MsgServer interface
-// for the provided Keeper.
-func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
-}
+// var _ types.MsgServer = msgServer{}
 
-var _ types.MsgServer = msgServer{}
+// // CreateUser creates a new user
+// func (k msgServer) CreateUser(
+// 	goCtx context.Context,
+// 	msg *types.MsgCreateUser,
+// ) (*types.MsgCreateUser, error) {
+// 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-// CreateUser creates a new user
-func (k msgServer) CreateUser(
-	goCtx context.Context,
-	msg *types.MsgCreateUser,
-) (
-	, error) {
-	ctx := sdk.UnwrapSDKContext(goCtx)
+// 	_, found := k.Keeper.CreateUser(ctx, []byte(msg.User))
+// 	if found {
+// 		return nil, err
 
-	_, found := k.Keeper.GetVerifiableCredential(ctx, []byte(msg.VerifiableCredential.Id))
-	if found {
-		return nil, sdkerrors.Wrapf(
-			types.ErrVerifiableCredentialFound,
-			"vc already exists",
-		)
+// 	}
 
-	}
+// 	k.Keeper.SetVerifiableCredential(
+// 		ctx,
+// 		[]byte(msg.VerifiableCredential.Id),
+// 		*msg.VerifiableCredential,
+// 	)
 
-	k.Keeper.SetVerifiableCredential(
-		ctx,
-		[]byte(msg.VerifiableCredential.Id),
-		*msg.VerifiableCredential,
-	)
-
-	return &types.MsgCreateVerifiableCredentialResponse{}, nil
-}
+// 	return &types.MsgCreateUser{}, nil
+// }

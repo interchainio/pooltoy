@@ -1,13 +1,5 @@
 package types
 
-// import (
-// 	"bytes"
-// 	"testing"
-
-// 	sdk "github.com/cosmos/cosmos-sdk/types"
-// 	"github.com/stretchr/testify/require"
-// )
-
 // func TestValidateGenesis(t *testing.T) {
 
 // 	testUsers := []User{

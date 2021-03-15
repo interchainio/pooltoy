@@ -1,6 +1,6 @@
 module github.com/interchainberlin/pooltoy
 
-go 1.13
+go 1.15
 
 require (
 	// Oct 23rd, 2020 backports to go into 39.2

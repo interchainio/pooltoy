@@ -1,0 +1,24 @@
+syntax = "proto3";
+package pooltoy.v1beta1;
+
+import "cosmos_proto/cosmos.proto";
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/interchainberlin/pooltoy/x/pooltoy/types";
+import "pooltoy/v1beta1/user.proto";
+
+// Query defines the gRPC querier service for the pooltoy module.
+service Query {
+    rpc QueryListUsers(QueryListUsersRequest) returns (QueryListUsersResponse) {
+        option (google.api.http).get = "/pooltoy/user";
+    }
+}
+
+message QueryListUsersRequest {
+}
+
+message QueryListUsersResponse {
+    repeated User users = 1;
+}

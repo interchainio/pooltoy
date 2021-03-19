@@ -6,7 +6,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -20,7 +19,7 @@ type MarshalFn func(value interface{}) []byte
 
 // Keeper of the pooltoy store
 type Keeper struct {
-	Cdc      codec.Marshaler
+	cdc      codec.BinaryMarshaler
 	storeKey sdk.StoreKey
 	memKey   sdk.StoreKey
 
@@ -31,7 +30,7 @@ type Keeper struct {
 
 // NewKeeper creates a pooltoy keeper
 func NewKeeper(
-	cdc codec.Marshaler,
+	cdc codec.BinaryMarshaler,
 	storeKey,
 	memKey sdk.StoreKey,
 
@@ -39,7 +38,7 @@ func NewKeeper(
 	accountKeeper authkeeper.AccountKeeper,
 ) *Keeper {
 	return &Keeper{
-		Cdc:      cdc,
+		cdc:      cdc,
 		storeKey: storeKey,
 		memKey:   memKey,
 
@@ -72,31 +71,3 @@ func (k Keeper) GetAll(ctx sdk.Context, prefix []byte) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, prefix)
 }
-
-// TODO: check out where accounts are now
-func (k Keeper) ListAccounts(ctx sdk.Context) []authtypes.AccountI {
-	return k.AccountKeeper.GetAllAccounts(ctx)
-}
-
-// Get returns the pubkey from the adddress-pubkey relation
-// func (k Keeper) Get(ctx sdk.Context, key string) (/* TODO: Fill out this type */, error) {
-// 	store := ctx.KVStore(k.storeKey)
-// 	var item /* TODO: Fill out this type */
-// 	byteKey := []byte(key)
-// 	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(byteKey), &item)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return item, nil
-// }
-
-// func (k Keeper) set(ctx sdk.Context, key string, value /* TODO: fill out this type */ ) {
-// 	store := ctx.KVStore(k.storeKey)
-// 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(value)
-// 	store.Set([]byte(key), bz)
-// }
-
-// func (k Keeper) delete(ctx sdk.Context, key string) {
-// 	store := ctx.KVStore(k.storeKey)
-// 	store.Delete([]byte(key))
-// }

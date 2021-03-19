@@ -8,10 +8,10 @@ import "google/protobuf/any.proto";
 option go_package = "github.com/interchainberlin/pooltoy/x/pooltoy/types";
 
 message User {
-  string id           = 1 [(gogoproto.moretags) = "yaml:\"id\""];
-  string creator      = 2 [(gogoproto.moretags) = "yaml:\"creator\""];
-  string user_account = 3 [(gogoproto.moretags) = "yaml:\"userAccount\""];
-  bool   is_admin     = 4 [(gogoproto.moretags) = "yaml:\"isAdmin\""];
-  string name         = 5 [(gogoproto.moretags) = "yaml:\"name\""];
-  string email        = 6 [(gogoproto.moretags) = "yaml:\"email\""];
+  string id           = 1;
+  string creator      = 2;
+  string user_account = 3;
+  bool   is_admin     = 4;
+  string name         = 5;
+  string email        = 6;
 }

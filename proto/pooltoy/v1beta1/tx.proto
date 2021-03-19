@@ -4,11 +4,21 @@ package pooltoy.v1beta1;
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "google/protobuf/any.proto";
+import "google/api/annotations.proto";
 
 option go_package = "github.com/interchainberlin/pooltoy/x/pooltoy/types";
 import "pooltoy/v1beta1/user.proto";
 
-message MsgCreateUser {
-  User user = 1 [(gogoproto.moretags) = "yaml:\"user\""];
-  string creator      = 2 [(gogoproto.moretags) = "yaml:\"creator\""];
+
+service Msg {
+ rpc CreateUser(MsgCreateUser) returns (MsgCreateUserResponse) {
+    option (google.api.http).post = "/pooltoy/user";
+  }
 }
+
+message MsgCreateUser {
+  User user = 1;
+  string creator = 2;
+}
+
+message MsgCreateUserResponse {}

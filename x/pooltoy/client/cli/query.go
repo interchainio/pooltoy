@@ -2,18 +2,10 @@ package cli
 
 import (
 	"fmt"
-	// "strings"
-
-	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/client/flags"
-
-	// "github.com/cosmos/cosmos-sdk/client/context"
-
-	// sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	"github.com/spf13/cobra"
 )
 
 // GetQueryCmd returns the cli query commands for this module
@@ -27,7 +19,32 @@ func GetQueryCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	flags.AddQueryFlagsToCmd(pooltoyQueryCmd)
+	pooltoyQueryCmd.AddCommand([]*cobra.Command{
+		queryListUsers(),
+	}...)
 
 	return pooltoyQueryCmd
+}
+
+func queryListUsers() *cobra.Command {
+	return &cobra.Command{
+		Use:   "list-users",
+		Short: "list all users",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := client.GetClientQueryContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(ctx)
+			req := &types.QueryListUsersRequest{}
+			res, err := queryClient.QueryListUsers(cmd.Context(), req)
+			if err != nil {
+				return err
+			}
+
+			return ctx.PrintProto(res)
+		},
+	}
 }

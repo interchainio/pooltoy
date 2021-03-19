@@ -1,8 +1,6 @@
 package pooltoy
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
@@ -18,11 +16,11 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		if u.IsAdmin {
 			oneAdmin = true
 		}
-		k.CreateUser(ctx, *u)
+		k.InsertUser(ctx, *u)
 	}
 	if !oneAdmin {
 		a := types.MakeAdmin()
-		k.CreateUser(ctx, *a)
+		k.InsertUser(ctx, *a)
 	}
 }
 
@@ -30,13 +28,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 // to a genesis file, which can be imported again
 // with InitGenesis
 func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
-	allUsersRaw, err := k.ListUsers(ctx)
-	if err != nil {
-		fmt.Println(err)
-		panic(err)
-	}
-	var users []*types.User
-	k.cdc.MustUnmarshalJSON(allUsersRaw, &users)
+	users := k.ListUsers(ctx)
 
 	// chain got into a state such that there were accounts with no corresponding users.
 	// ideally this would never happen but as it is currently the case these users need to be manually created.

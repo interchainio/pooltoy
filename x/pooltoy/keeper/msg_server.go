@@ -1,39 +1,57 @@
 package keeper
 
-// import (
-// 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
-// )
+import (
+	"context"
+	"fmt"
 
-// type msgServer struct {
-// 	Keeper
-// }
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
+)
 
-// // NewMsgServerImpl returns an implementation of the MsgServer interface
-// // for the provided Keeper.
-// func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-// 	return &msgServer{Keeper: keeper}
-// }
+var _ types.MsgServer = Keeper{}
 
-// var _ types.MsgServer = msgServer{}
+func (k Keeper) CreateUser(c context.Context, msg *types.MsgCreateUser) (*types.MsgCreateUserResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	u := *msg.User
+	allUsers := k.ListUsers(ctx)
 
-// // CreateUser creates a new user
-// func (k msgServer) CreateUser(
-// 	goCtx context.Context,
-// 	msg *types.MsgCreateUser,
-// ) (*types.MsgCreateUser, error) {
-// 	ctx := sdk.UnwrapSDKContext(goCtx)
+	// does this creator have permission to create this new user?
+	// bear in mind special case allows create as initialization when there are no users yet
+	ca, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		// TODO: unify error handling
+		errMsg := fmt.Sprintf("invalid address format", msg.Creator)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, errMsg)
+	}
+	creator := k.GetUserByAccAddress(ctx, ca)
+	if creator.UserAccount == "" && len(allUsers) != 0 {
+		errMsg := fmt.Sprintf("user %s does not exist", msg.Creator)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
+	}
 
-// 	_, found := k.Keeper.CreateUser(ctx, []byte(msg.User))
-// 	if found {
-// 		return nil, err
+	//  validate address format
+	a, err := sdk.AccAddressFromBech32(u.UserAccount)
+	if err != nil {
+		errMsg := fmt.Sprintf("invalid address format", u.UserAccount)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, errMsg)
+	}
+	//  check that new user doesn't exist already
+	if existingUser := k.GetUserByAccAddress(ctx, a); existingUser.UserAccount == u.UserAccount {
+		errMsg := fmt.Sprintf("user %s already exists", u.UserAccount)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, errMsg)
+	}
 
-// 	}
+	// creator must be an admin
+	if creator.IsAdmin || (u.IsAdmin && len(allUsers) == 0) {
+		// if yes
+		k.InsertUser(ctx, u)
+	} else {
+		// if no
+		// throw error
+		errMsg := fmt.Sprintf("user %s (%s) is not an admin", creator.Name, msg.Creator)
+		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
+	}
 
-// 	k.Keeper.SetVerifiableCredential(
-// 		ctx,
-// 		[]byte(msg.VerifiableCredential.Id),
-// 		*msg.VerifiableCredential,
-// 	)
-
-// 	return &types.MsgCreateUser{}, nil
-// }
+	return &types.MsgCreateUserResponse{}, nil
+}

@@ -16,6 +16,7 @@ type claimReq struct {
 	Address string
 }
 
+// TODO: move this to message _server
 func faucetHandler(cliCtx client.Context) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var claim claimReq

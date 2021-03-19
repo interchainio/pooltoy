@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/charleenfei/modules/incubator/faucet"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -27,7 +28,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	ibc "github.com/cosmos/cosmos-sdk/x/ibc/core"
 	"github.com/cosmos/cosmos-sdk/x/supply"
-	"github.com/okwme/modules/incubator/faucet"
 	abci "github.com/tendermint/tendermint/abci/types"
 	"github.com/tendermint/tendermint/libs/log"
 	tmos "github.com/tendermint/tendermint/libs/os"
@@ -45,7 +45,6 @@ import (
 	"github.com/interchainberlin/pooltoy/x/pooltoy"
 	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
 
-	// "github.com/okwme/modules/incubator/faucet"
 	ante "github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"

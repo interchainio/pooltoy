@@ -9,5 +9,5 @@ option go_package = "github.com/interchainberlin/pooltoy/x/pooltoy/types";
 import "pooltoy/v1beta1/user.proto";
 
 message GenesisState {
-  repeated User user = 1 [(gogoproto.moretags) = "yaml:\"user\""];
+  repeated User user = 1;
 }

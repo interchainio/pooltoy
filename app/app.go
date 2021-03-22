@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/charleenfei/modules/incubator/faucet"
+	"github.com/cosmos/cosmos-sdk/baseapp"
 	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -14,59 +15,56 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
+	servertypes "github.com/cosmos/cosmos-sdk/server/types"
 	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
-	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
-	"github.com/cosmos/cosmos-sdk/x/bank"
-	"github.com/cosmos/cosmos-sdk/x/capability"
-	distr "github.com/cosmos/cosmos-sdk/x/distribution"
-	"github.com/cosmos/cosmos-sdk/x/genutil"
-	"github.com/cosmos/cosmos-sdk/x/gov"
-	ibc "github.com/cosmos/cosmos-sdk/x/ibc/core"
-	"github.com/cosmos/cosmos-sdk/x/supply"
-	abci "github.com/tendermint/tendermint/abci/types"
-	"github.com/tendermint/tendermint/libs/log"
-	tmos "github.com/tendermint/tendermint/libs/os"
-	dbm "github.com/tendermint/tm-db"
-
-	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
-	"github.com/cosmos/cosmos-sdk/x/upgrade"
-	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
-
-	"github.com/cosmos/cosmos-sdk/x/params"
-	"github.com/cosmos/cosmos-sdk/x/slashing"
-	"github.com/cosmos/cosmos-sdk/x/staking"
-	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	appparams "github.com/interchainberlin/pooltoy/app/params"
-	"github.com/interchainberlin/pooltoy/x/pooltoy"
-	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
-
 	ante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/bank"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/cosmos/cosmos-sdk/x/capability"
+	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	distrclient "github.com/cosmos/cosmos-sdk/x/distribution/client"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
+	"github.com/cosmos/cosmos-sdk/x/gov"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	ibc "github.com/cosmos/cosmos-sdk/x/ibc/core"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
 	paramskeeper "github.com/cosmos/cosmos-sdk/x/params/keeper"
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	paramproposal "github.com/cosmos/cosmos-sdk/x/params/types/proposal"
+	"github.com/cosmos/cosmos-sdk/x/slashing"
 	slashingkeeper "github.com/cosmos/cosmos-sdk/x/slashing/keeper"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
+	"github.com/cosmos/cosmos-sdk/x/staking"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
+	"github.com/cosmos/cosmos-sdk/x/upgrade"
+	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+	appParams "github.com/interchainberlin/pooltoy/app/params"
+	"github.com/interchainberlin/pooltoy/x/pooltoy"
+	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
 	pooltoytypes "github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
+	"github.com/tendermint/tendermint/libs/log"
+	tmos "github.com/tendermint/tendermint/libs/os"
+	dbm "github.com/tendermint/tm-db"
 )
 
 const appName = "app"
@@ -92,7 +90,6 @@ var (
 		params.AppModuleBasic{},
 		upgrade.AppModuleBasic{},
 		slashing.AppModuleBasic{},
-		// supply.AppModuleBasic{},
 		pooltoy.AppModuleBasic{},
 		faucet.AppModule{},
 	)
@@ -113,22 +110,13 @@ var (
 	}
 )
 
-// func MakeCodec() *codec.Codec {
-// 	var cdc = codec.New()
+var _ simapp.App = (*PooltoyApp)(nil)
 
-// 	ModuleBasics.RegisterCodec(cdc)
-// 	vesting.RegisterCodec(cdc)
-// 	sdk.RegisterCodec(cdc)
-// 	codec.RegisterCrypto(cdc)
-
-// 	return cdc.Seal()
-// }
-
-type NewApp struct {
+type PooltoyApp struct {
 	*bam.BaseApp
 	appName string
 
-	cdc               *codec.LegacyAmino
+	legacyAmino       *codec.LegacyAmino
 	appCodec          codec.Marshaler
 	interfaceRegistry types.InterfaceRegistry
 
@@ -138,6 +126,7 @@ type NewApp struct {
 	keys  map[string]*sdk.KVStoreKey
 	tKeys map[string]*sdk.TransientStoreKey
 
+	// TODO: figure out subspaces
 	// subspaces map[string]params.Subspace
 
 	// keepers
@@ -153,18 +142,13 @@ type NewApp struct {
 	FaucetKeeper   faucet.Keeper
 
 	mm *module.Manager
-
 	sm *module.SimulationManager
 }
 
-var _ simapp.App = (*NewApp)(nil)
-
-func NewInitApp(
-	encodingConfig appparams.EncodingConfig,
-	homePath string,
-	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool,
-	invCheckPeriod uint, skipUpgradeHeights map[int64]bool, baseAppOptions ...func(*bam.BaseApp),
-) *NewApp {
+func NewPooltoyApp(
+	logger log.Logger, db dbm.DB, traceStore io.Writer, loadLatest bool, skipUpgradeHeights map[int64]bool,
+	homePath string, invCheckPeriod uint, encodingConfig appParams.EncodingConfig, appOpts servertypes.AppOptions, baseAppOptions ...func(*baseapp.BaseApp),
+) *PooltoyApp {
 
 	appCodec := encodingConfig.Marshaler
 	cdc := encodingConfig.Amino
@@ -183,6 +167,7 @@ func NewInitApp(
 		authtypes.StoreKey,
 		stakingtypes.StoreKey,
 		distrtypes.StoreKey,
+		banktypes.StoreKey,
 		slashingtypes.StoreKey,
 		paramstypes.StoreKey,
 		govtypes.StoreKey,
@@ -191,14 +176,13 @@ func NewInitApp(
 		faucet.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(
-		// TODO: stakingtype transient store key??
+		// TODO: why stakingtype transient store key??
 		// stakingtypes.TStoreKey,
 		paramstypes.TStoreKey,
 	)
 
-	app := &NewApp{
+	app := &PooltoyApp{
 		BaseApp:        bApp,
-		cdc:            cdc,
 		invCheckPeriod: invCheckPeriod,
 		keys:           keys,
 		tKeys:          tKeys,
@@ -241,14 +225,6 @@ func NewInitApp(
 		app.BlockedAddrs(),
 	)
 
-	// app.supplyKeeper = supply.NewKeeper(
-	// 	app.cdc,
-	// 	keys[supply.StoreKey],
-	// 	app.accountKeeper,
-	// 	app.bankKeeper,
-	// 	maccPerms,
-	// )
-
 	stakingKeeper := stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
@@ -274,12 +250,6 @@ func NewInitApp(
 		&stakingKeeper,
 		app.GetSubspace(slashingtypes.ModuleName),
 	)
-
-	// app.takingKeeper = *stakingKeeper.SetHooks(
-	// 	staking.NewMultiStakingHooks(
-	// 		app.distrKeeper.Hooks(),
-	// 		app.slashingKeeper.Hooks()),
-	// )
 
 	app.UpgradeKeeper = upgradekeeper.NewKeeper(
 		skipUpgradeHeights,
@@ -318,14 +288,13 @@ func NewInitApp(
 	)
 
 	app.FaucetKeeper = faucet.NewKeeper(
-		// TODO: look into Supply Keeper!
-		app.SupplyKeeper,
+		app.BankKeeper,
 		app.StakingKeeper,
 		app.AccountKeeper,
 		1,            // amount for mint
 		24*time.Hour, // rate limit by time
 		keys[faucet.StoreKey],
-		app.cdc,
+		app.appCodec,
 	)
 
 	// register the proposal types
@@ -405,7 +374,6 @@ func NewInitApp(
 		),
 
 		faucet.NewAppModule(
-			appCodec,
 			app.FaucetKeeper,
 		),
 		upgrade.NewAppModule(app.UpgradeKeeper),
@@ -429,7 +397,6 @@ func NewInitApp(
 		slashingtypes.ModuleName,
 		govtypes.ModuleName,
 		pooltoytypes.ModuleName,
-		// supplytypes.ModuleName,
 		genutiltypes.ModuleName,
 	)
 
@@ -469,7 +436,7 @@ func NewInitApp(
 	return app
 }
 
-func (app *NewApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
+func (app *PooltoyApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.ResponseInitChain {
 	var genesisState GenesisState
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
@@ -477,49 +444,45 @@ func (app *NewApp) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 
-func (app *NewApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
+func (app *PooltoyApp) BeginBlocker(ctx sdk.Context, req abci.RequestBeginBlock) abci.ResponseBeginBlock {
 	return app.mm.BeginBlock(ctx, req)
 }
 
-func (app *NewApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
+func (app *PooltoyApp) EndBlocker(ctx sdk.Context, req abci.RequestEndBlock) abci.ResponseEndBlock {
 	return app.mm.EndBlock(ctx, req)
 }
 
-func (app *NewApp) LoadHeight(height int64) error {
+func (app *PooltoyApp) LoadHeight(height int64) error {
 	return app.LoadVersion(height)
 }
 
-func (app *NewApp) ModuleAccountAddrs() map[string]bool {
+func (app *PooltoyApp) ModuleAccountAddrs() map[string]bool {
 	modAccAddrs := make(map[string]bool)
 	for acc := range maccPerms {
-		modAccAddrs[supply.NewModuleAddress(acc).String()] = true
+		modAccAddrs[authtypes.NewModuleAddress(acc).String()] = true
 	}
 
 	return modAccAddrs
 }
 
 // LegacyAmino returns SimApp's amino codec.
-func (app *NewApp) LegacyAmino() *codec.LegacyAmino {
-	return app.cdc
+func (app *PooltoyApp) LegacyAmino() *codec.LegacyAmino {
+	return app.legacyAmino
 }
 
-// func (app *NewApp) Codec() *codec.Codec {
-// 	return app.cdc
-// }
-
 // GetSubspace returns a param subspace for a given module name.
-func (app *NewApp) GetSubspace(moduleName string) paramstypes.Subspace {
+func (app *PooltoyApp) GetSubspace(moduleName string) paramstypes.Subspace {
 	subspace, _ := app.ParamsKeeper.GetSubspace(moduleName)
 	return subspace
 }
 
-func (app *NewApp) SimulationManager() *module.SimulationManager {
+func (app *PooltoyApp) SimulationManager() *module.SimulationManager {
 	return app.sm
 }
 
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.
-func (app *NewApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
+func (app *PooltoyApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
 	clientCtx := apiSvr.ClientCtx
 	rpc.RegisterRoutes(clientCtx, apiSvr.Router)
 	// Register legacy tx routes.
@@ -533,12 +496,12 @@ func (app *NewApp) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APICon
 }
 
 // RegisterTxService implements the Application.RegisterTxService method.
-func (app *NewApp) RegisterTxService(clientCtx client.Context) {
+func (app *PooltoyApp) RegisterTxService(clientCtx client.Context) {
 	authtx.RegisterTxService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.BaseApp.Simulate, app.interfaceRegistry)
 }
 
 // RegisterTendermintService implements the Application.RegisterTendermintService method.
-func (app *NewApp) RegisterTendermintService(clientCtx client.Context) {
+func (app *PooltoyApp) RegisterTendermintService(clientCtx client.Context) {
 	tmservice.RegisterTendermintService(app.BaseApp.GRPCQueryRouter(), clientCtx, app.interfaceRegistry)
 }
 
@@ -552,7 +515,7 @@ func GetMaccPerms() map[string][]string {
 
 // BlockedAddrs returns all the app's module account addresses that are not
 // allowed to receive external tokens.
-func (app *NewApp) BlockedAddrs() map[string]bool {
+func (app *PooltoyApp) BlockedAddrs() map[string]bool {
 	blockedAddrs := make(map[string]bool)
 	for acc := range maccPerms {
 		blockedAddrs[authtypes.NewModuleAddress(acc).String()] = !allowedReceivingModAcc[acc]

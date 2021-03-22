@@ -6,6 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 	"github.com/tendermint/tendermint/libs/log"
@@ -19,10 +20,8 @@ type MarshalFn func(value interface{}) []byte
 
 // Keeper of the pooltoy store
 type Keeper struct {
-	cdc      codec.BinaryMarshaler
-	storeKey sdk.StoreKey
-	memKey   sdk.StoreKey
-
+	cdc           codec.BinaryMarshaler
+	storeKey      sdk.StoreKey
 	CoinKeeper    bankkeeper.Keeper
 	AccountKeeper authkeeper.AccountKeeper
 	// paramspace types.ParamSubspace
@@ -31,17 +30,13 @@ type Keeper struct {
 // NewKeeper creates a pooltoy keeper
 func NewKeeper(
 	cdc codec.BinaryMarshaler,
-	storeKey,
-	memKey sdk.StoreKey,
-
+	storeKey sdk.StoreKey,
 	coinKeeper bankkeeper.Keeper,
 	accountKeeper authkeeper.AccountKeeper,
-) *Keeper {
-	return &Keeper{
-		cdc:      cdc,
-		storeKey: storeKey,
-		memKey:   memKey,
-
+) Keeper {
+	return Keeper{
+		cdc:           cdc,
+		storeKey:      storeKey,
 		CoinKeeper:    coinKeeper,
 		AccountKeeper: accountKeeper,
 	}
@@ -70,4 +65,8 @@ func (k Keeper) Get(ctx sdk.Context, key []byte, prefix []byte, unmarshal Unmars
 func (k Keeper) GetAll(ctx sdk.Context, prefix []byte) sdk.Iterator {
 	store := ctx.KVStore(k.storeKey)
 	return sdk.KVStorePrefixIterator(store, prefix)
+}
+
+func (k Keeper) ListAccounts(ctx sdk.Context) []authtypes.AccountI {
+	return k.AccountKeeper.GetAllAccounts(ctx)
 }

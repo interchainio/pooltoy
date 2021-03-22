@@ -5,7 +5,6 @@ import (
 	"github.com/google/uuid"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
-	// abci "github.com/tendermint/tendermint/abci/types"
 )
 
 // InitGenesis initialize default parameters
@@ -37,14 +36,14 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 		for _, acct := range allAccounts {
 			found := false
 			for _, u := range users {
-				a := acct.GetAddress
-				if u.UserAccount == a {
+				a := acct.GetAddress()
+				if u.UserAccount == a.String() {
 					found = true
 				}
 			}
 			if !found {
 				n := types.User{
-					UserAccount: acct.GetAddress(),
+					UserAccount: acct.GetAddress().String(),
 					IsAdmin:     false,
 					Id:          uuid.New().String(),
 					Name:        "",
@@ -57,25 +56,3 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 
 	return types.NewGenesisState(users)
 }
-
-// "gov": {
-// 	"starting_proposal_id": 1,
-// 	"deposits": [],
-// 	"votes": [],
-// 	"proposals": [],
-// 	"deposit_params": {
-// 		"min_deposit": [],
-// 		"max_deposit_period": 86400000000000
-// 	},
-// 	"voting_params": {
-// 		"voting_period": 86400000000000
-// 	},
-// 	"tally_params": {
-// 		"quorum": {
-// 			"int": ""
-// 		},
-// 		"threshold": ,
-// 		"veto":
-// 	}
-
-// },

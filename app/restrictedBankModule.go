@@ -5,19 +5,20 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/cosmos/cosmos-sdk/x/auth"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	"github.com/cosmos/cosmos-sdk/x/bank"
+	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 )
 
 // RestrictedBankModule overrides the NFT module for custom handlers
 type RestrictedBankModule struct {
 	bank.AppModule
-	keeper        bank.Keeper
-	accountKeeper auth.AccountKeeper
+	keeper        bankkeeper.Keeper
+	accountKeeper authkeeper.AccountKeeper
 }
 
 // NewRestrictedBankModule generates a new NFT Module
-func NewRestrictedBankModule(appModule bank.AppModule, keeper bank.Keeper, accountKeeper auth.AccountKeeper) RestrictedBankModule {
+func NewRestrictedBankModule(appModule bank.AppModule, keeper bankkeeper.Keeper, accountKeeper authkeeper.AccountKeeper) RestrictedBankModule {
 	return RestrictedBankModule{
 		AppModule:     appModule,
 		keeper:        keeper,
@@ -31,7 +32,7 @@ func (am RestrictedBankModule) NewHandler() sdk.Handler {
 }
 
 // RestrictedBankHandler routes the messages to the handlers
-func RestrictedBankHandler(k bank.Keeper, ak auth.AccountKeeper) sdk.Handler {
+func RestrictedBankHandler(k bankkeeper.Keeper, ak authkeeper.AccountKeeper) sdk.Handler {
 	oldHandler := bank.NewHandler(k)
 
 	return func(ctx sdk.Context, msg sdk.Msg) (*sdk.Result, error) {
@@ -54,7 +55,7 @@ func RestrictedBankHandler(k bank.Keeper, ak auth.AccountKeeper) sdk.Handler {
 }
 
 // Handle MsgSend.
-func handleMsgSend(ctx sdk.Context, k bank.Keeper, msg bank.MsgSend, ak auth.AccountKeeper, oldHandler sdk.Handler) (*sdk.Result, error) {
+func handleMsgSend(ctx sdk.Context, k bankkeeper.Keeper, msg bank.MsgSend, ak authkeeper.AccountKeeper, oldHandler sdk.Handler) (*sdk.Result, error) {
 	fmt.Println("new restricted bank handler handleMsgSend getting used - updated")
 
 	acc := ak.GetAccount(ctx, msg.ToAddress)

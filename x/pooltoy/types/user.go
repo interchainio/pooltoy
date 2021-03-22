@@ -22,5 +22,5 @@ func NewUser(
 
 // GetBytes is a helper for serialising
 func (usr User) GetBytes() []byte {
-	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&usr))
+	return sdk.MustSortJSON(cdc.MustMarshalJSON(&usr))
 }

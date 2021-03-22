@@ -3,7 +3,7 @@ module github.com/interchainberlin/pooltoy
 go 1.15
 
 require (
-	github.com/charleenfei/modules/incubator/faucet v0.0.0-20210319172353-036fcb8447a9 // indirect
+	github.com/charleenfei/modules/incubator/faucet v0.0.0-20210319172353-036fcb8447a9
 	github.com/cosmos/cosmos-sdk v0.42.2
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.1
@@ -11,7 +11,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/regen-network/cosmos-proto v0.3.1
-	github.com/spf13/cast v1.3.1 // indirect
+	github.com/spf13/cast v1.3.1
 	github.com/spf13/cobra v1.1.3
 	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.7.0

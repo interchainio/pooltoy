@@ -82,9 +82,8 @@ func (a AppModuleBasic) RegisterInterfaces(registry cdctypes.InterfaceRegistry) 
 // AppModule implements an application module for the pooltoy module.
 type AppModule struct {
 	AppModuleBasic
-	cdc        codec.Marshaler
-	keeper     keeper.Keeper
-	coinKeeper bankkeeper.Keeper
+	cdc    codec.Marshaler
+	keeper keeper.Keeper
 }
 
 // NewAppModule creates a new AppModule object
@@ -93,7 +92,6 @@ func NewAppModule(cdc codec.Marshaler, k keeper.Keeper, bankKeeper bankkeeper.Ke
 		AppModuleBasic: AppModuleBasic{},
 		cdc:            cdc,
 		keeper:         k,
-		coinKeeper:     bankKeeper,
 	}
 }
 

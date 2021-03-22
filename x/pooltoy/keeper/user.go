@@ -26,7 +26,7 @@ func (k Keeper) GetUserByAccAddress(ctx sdk.Context, queriedUserAccAddress sdk.A
 	for ; iterator.Valid(); iterator.Next() {
 		var user types.User
 		// TODO: check unmarshaler, MustUnmarshalBinaryBare?
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(store.Get(iterator.Key()), &user)
+		k.cdc.MustUnmarshalBinaryBare(store.Get(iterator.Key()), &user)
 		if user.UserAccount == queriedUserAccAddress.String() {
 			queriedUser = user
 		}
@@ -40,7 +40,7 @@ func (k Keeper) ListUsers(ctx sdk.Context) []*types.User {
 	iterator := sdk.KVStorePrefixIterator(store, []byte(types.UserPrefix))
 	for ; iterator.Valid(); iterator.Next() {
 		var user *types.User
-		k.cdc.MustUnmarshalBinaryLengthPrefixed(store.Get(iterator.Key()), user)
+		k.cdc.MustUnmarshalBinaryBare(store.Get(iterator.Key()), user)
 		userList = append(userList, user)
 	}
 	return userList

@@ -7,7 +7,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
@@ -22,7 +21,6 @@ type MarshalFn func(value interface{}) []byte
 type Keeper struct {
 	cdc           codec.BinaryMarshaler
 	storeKey      sdk.StoreKey
-	CoinKeeper    bankkeeper.Keeper
 	AccountKeeper authkeeper.AccountKeeper
 	// paramspace types.ParamSubspace
 }
@@ -31,13 +29,11 @@ type Keeper struct {
 func NewKeeper(
 	cdc codec.BinaryMarshaler,
 	storeKey sdk.StoreKey,
-	coinKeeper bankkeeper.Keeper,
 	accountKeeper authkeeper.AccountKeeper,
 ) Keeper {
 	return Keeper{
 		cdc:           cdc,
 		storeKey:      storeKey,
-		CoinKeeper:    coinKeeper,
 		AccountKeeper: accountKeeper,
 	}
 }

@@ -7,7 +7,6 @@ import (
 
 	"github.com/charleenfei/modules/incubator/faucet"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	bam "github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
@@ -104,7 +103,6 @@ var (
 		faucet.ModuleName:              {authtypes.Minter},
 	}
 
-	// new Bank module update: module accounts that are allowed to receive tokens
 	allowedReceivingModAcc = map[string]bool{
 		distrtypes.ModuleName: true,
 	}
@@ -113,7 +111,7 @@ var (
 var _ simapp.App = (*PooltoyApp)(nil)
 
 type PooltoyApp struct {
-	*bam.BaseApp
+	*baseapp.BaseApp
 	appName string
 
 	legacyAmino       *codec.LegacyAmino
@@ -125,9 +123,6 @@ type PooltoyApp struct {
 	// keys
 	keys  map[string]*sdk.KVStoreKey
 	tKeys map[string]*sdk.TransientStoreKey
-
-	// TODO: figure out subspaces
-	// subspaces map[string]params.Subspace
 
 	// keepers
 	ParamsKeeper   paramskeeper.Keeper
@@ -154,7 +149,7 @@ func NewPooltoyApp(
 	cdc := encodingConfig.Amino
 	interfaceRegistry := encodingConfig.InterfaceRegistry
 
-	bApp := bam.NewBaseApp(
+	bApp := baseapp.NewBaseApp(
 		appName,
 		logger, db,
 		encodingConfig.TxConfig.TxDecoder(),
@@ -186,9 +181,9 @@ func NewPooltoyApp(
 		invCheckPeriod: invCheckPeriod,
 		keys:           keys,
 		tKeys:          tKeys,
-		// subspaces:      make(map[string]params.Subspace),
 	}
 
+	// TODO: figure out usage of subspaces
 	app.ParamsKeeper = initParamsKeeper(
 		appCodec,
 		cdc,
@@ -198,15 +193,8 @@ func NewPooltoyApp(
 
 	// set the BaseApp's parameter store
 	bApp.SetParamStore(
-		app.ParamsKeeper.Subspace(bam.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()),
+		app.ParamsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramskeeper.ConsensusParamsKeyTable()),
 	)
-
-	// app.paramsKeeper = params.NewKeeper(app.cdc, keys[params.StoreKey], tKeys[params.TStoreKey])
-	// app.subspaces[auth.ModuleName] = app.paramsKeeper.Subspace(auth.DefaultParamspace)
-	// app.subspaces[bank.ModuleName] = app.paramsKeeper.Subspace(bank.DefaultParamspace)
-	// app.subspaces[staking.ModuleName] = app.paramsKeeper.Subspace(staking.DefaultParamspace)
-	// app.subspaces[distr.ModuleName] = app.paramsKeeper.Subspace(distr.DefaultParamspace)
-	// app.subspaces[slashing.ModuleName] = app.paramsKeeper.Subspace(slashing.DefaultParamspace)
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -257,33 +245,10 @@ func NewPooltoyApp(
 		appCodec,
 		homePath,
 	)
-	// no-op handler for "nextversion" upgrade
-	// app.upgradeKeeper.SetUpgradeHandler("nextversion", func(ctx sdk.Context, plan upgrade.Plan) {
-	// 	// faucetAddr, _ := sdk.AccAddressFromBech32("akash1dz70tfxxrsh8fned6len7feu3atz7k59zgz77n")
-	// 	// personalAcc1, _ := sdk.AccAddressFromBech32("akash1dz70tfxxrsh8fned6len7feu3atz7k59zgz77n")
-	// 	// personalAcc2, _ := sdk.AccAddressFromBech32("akash1y4uskp4v6s086pdg6phufqcg82g9xd494kdwmn")
-	// 	// valAddr, _ := sdk.ValAddressFromBech32("akashvaloper1753ew9z7cfhu6awyp6ff7qtm9ex30kg3r7zd7j")
-
-	// 	// _, _ = app.bankKeeper.AddCoins(ctx, faucetAddr, sdk.Coins{sdk.Coin{Denom: "uakt", Amount: sdk.NewInt(10000000000)}})
-	// 	// _, _ = app.bankKeeper.AddCoins(ctx, personalAcc1, sdk.Coins{sdk.Coin{Denom: "uakt", Amount: sdk.NewInt(10000000000)}})
-	// 	// _, _ = app.bankKeeper.AddCoins(ctx, personalAcc2, sdk.Coins{sdk.Coin{Denom: "uakt", Amount: sdk.NewInt(10000000000)}})
-
-	// 	// delegation := stakingTypes.Delegation{
-	// 	// 	DelegatorAddress: faucetAddr,
-	// 	// 	ValidatorAddress: valAddr,
-	// 	// 	Shares:           sdk.NewDec(100000000000),
-	// 	// }
-
-	// 	// app.stakingKeeper.SetDelegation(ctx, delegation)
-
-	// 	votingParams := gov.NewVotingParams(6000000000)
-	// 	app.paramsKeeper.Subspace(gov.DefaultParamspace).Set(ctx, gov.ParamStoreKeyVotingParams, &votingParams)
-	// })
 
 	app.PooltoyKeeper = pooltoykeeper.NewKeeper(
 		appCodec,
 		keys[pooltoytypes.StoreKey],
-		app.BankKeeper,
 		app.AccountKeeper,
 	)
 
@@ -314,17 +279,6 @@ func NewPooltoyApp(
 		govRouter,
 	)
 
-	bankModule := bank.NewAppModule(
-		appCodec,
-		app.BankKeeper,
-		app.AccountKeeper,
-	)
-	restrictedBank := NewRestrictedBankModule(
-		bankModule,
-		app.BankKeeper,
-		app.AccountKeeper,
-	)
-
 	app.mm = module.NewManager(
 		genutil.NewAppModule(
 			app.AccountKeeper,
@@ -337,10 +291,6 @@ func NewPooltoyApp(
 			app.AccountKeeper,
 			nil,
 		),
-		restrictedBank,
-		// TODO: why two banks?
-		// bank.NewAppModule(app.bankKeeper, app.accountKeeper),
-		// supply.NewAppModule(app.supplyKeeper, app.accountKeeper),
 		distr.NewAppModule(
 			appCodec,
 			app.DistrKeeper,
@@ -465,7 +415,6 @@ func (app *PooltoyApp) ModuleAccountAddrs() map[string]bool {
 	return modAccAddrs
 }
 
-// LegacyAmino returns SimApp's amino codec.
 func (app *PooltoyApp) LegacyAmino() *codec.LegacyAmino {
 	return app.legacyAmino
 }
@@ -515,6 +464,7 @@ func GetMaccPerms() map[string][]string {
 
 // BlockedAddrs returns all the app's module account addresses that are not
 // allowed to receive external tokens.
+// TODO: verify distr module here? how does this check work?
 func (app *PooltoyApp) BlockedAddrs() map[string]bool {
 	blockedAddrs := make(map[string]bool)
 	for acc := range maccPerms {

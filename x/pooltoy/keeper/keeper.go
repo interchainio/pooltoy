@@ -22,7 +22,6 @@ type Keeper struct {
 	cdc           codec.BinaryMarshaler
 	storeKey      sdk.StoreKey
 	AccountKeeper authkeeper.AccountKeeper
-	// paramspace types.ParamSubspace
 }
 
 // NewKeeper creates a pooltoy keeper

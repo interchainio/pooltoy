@@ -1,0 +1,13 @@
+syntax = "proto3";
+package pooltoy;
+
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/interchainberlin/pooltoy/x/pooltoy/types";
+import "pooltoy/v1beta1/user.proto";
+
+message GenesisState {
+  repeated User user = 1;
+}

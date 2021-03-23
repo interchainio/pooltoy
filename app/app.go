@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/charleenfei/modules/incubator/faucet"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -56,6 +55,9 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	appParams "github.com/interchainberlin/pooltoy/app/params"
+	"github.com/interchainberlin/pooltoy/x/faucet"
+	faucetkeeper "github.com/interchainberlin/pooltoy/x/faucet/keeper"
+	faucettypes "github.com/interchainberlin/pooltoy/x/faucet/types"
 	"github.com/interchainberlin/pooltoy/x/pooltoy"
 	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
 	pooltoytypes "github.com/interchainberlin/pooltoy/x/pooltoy/types"
@@ -100,7 +102,7 @@ var (
 		stakingtypes.BondedPoolName:    {authtypes.Burner, authtypes.Staking},
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
-		faucet.ModuleName:              {authtypes.Minter},
+		faucettypes.ModuleName:         {authtypes.Minter},
 	}
 
 	allowedReceivingModAcc = map[string]bool{
@@ -112,7 +114,6 @@ var _ simapp.App = (*PooltoyApp)(nil)
 
 type PooltoyApp struct {
 	*baseapp.BaseApp
-	appName string
 
 	legacyAmino       *codec.LegacyAmino
 	appCodec          codec.Marshaler
@@ -134,7 +135,7 @@ type PooltoyApp struct {
 	UpgradeKeeper  upgradekeeper.Keeper
 	DistrKeeper    distrkeeper.Keeper
 	PooltoyKeeper  pooltoykeeper.Keeper
-	FaucetKeeper   faucet.Keeper
+	FaucetKeeper   faucetkeeper.Keeper
 
 	mm *module.Manager
 	sm *module.SimulationManager
@@ -168,7 +169,7 @@ func NewPooltoyApp(
 		govtypes.StoreKey,
 		upgradetypes.StoreKey,
 		pooltoytypes.StoreKey,
-		faucet.StoreKey)
+		faucettypes.StoreKey)
 
 	tKeys := sdk.NewTransientStoreKeys(
 		// TODO: why stakingtype transient store key??
@@ -252,13 +253,13 @@ func NewPooltoyApp(
 		app.AccountKeeper,
 	)
 
-	app.FaucetKeeper = faucet.NewKeeper(
+	app.FaucetKeeper = faucetkeeper.NewKeeper(
 		app.BankKeeper,
 		app.StakingKeeper,
 		app.AccountKeeper,
 		1,            // amount for mint
 		24*time.Hour, // rate limit by time
-		keys[faucet.StoreKey],
+		keys[faucettypes.StoreKey],
 		app.appCodec,
 	)
 

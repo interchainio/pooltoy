@@ -1,0 +1,25 @@
+syntax = "proto3";
+package faucet;
+
+import "cosmos_proto/cosmos.proto";
+import "google/api/annotations.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/charleenfei/modules/incubator/faucet/types";
+
+// Query defines the gRPC querier service for the faucet module.
+service Query {
+      // WhenBrr queries the last time an address minted 
+    rpc QueryWhenBrr(QueryWhenBrrRequest) returns (QueryWhenBrrResponse) {
+        option (google.api.http).get = "/whenBrr/{address}";
+    }
+}
+
+message QueryWhenBrrRequest {
+    string address = 1;
+}
+
+message QueryWhenBrrResponse {
+    int64 timeLeft = 1;
+}

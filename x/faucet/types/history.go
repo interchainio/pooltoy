@@ -18,26 +18,27 @@ func NewMintHistory(minter sdk.AccAddress, tally int64) *MintHistory {
 	}
 }
 
-// Route should return the name of the module
-func (msg MintHistory) Route() string { return RouterKey }
-
 // Type should return the action
-func (msg MintHistory) Type() string { return TypeMintHistory }
+func (m MintHistory) Type() string { return TypeMintHistory }
 
 // ValidateBasic runs stateless checks on the message
-func (msg MintHistory) ValidateBasic() error {
-	_, err := sdk.AccAddressFromBech32(msg.Minter)
+// TODO: more complex validation?
+func (m MintHistory) ValidateBasic() error {
+	_, err := sdk.AccAddressFromBech32(m.Minter)
 	if err != nil {
-		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Minter)
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, m.Minter)
 	}
 	return nil
 }
 
 // GetSigners defines whose signature is required
-func (msg MintHistory) GetSigners() []sdk.AccAddress {
-	addr, err := sdk.AccAddressFromBech32(msg.Minter)
+func (m MintHistory) GetSigners() []sdk.AccAddress {
+	addr, err := sdk.AccAddressFromBech32(m.Minter)
 	if err != nil {
 		panic(err)
 	}
 	return []sdk.AccAddress{addr}
 }
+
+//Marshal
+//Unmarshal

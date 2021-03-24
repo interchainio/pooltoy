@@ -2,8 +2,11 @@ package types
 
 import (
 	"fmt"
+)
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+var (
+	c = "cosmos1qd4gsa4mlnpzmv4zsf9ghdrsgkt5avs8zte65u"
+	u = "cosmos1qd4gsa4mlnpzmv4zsf9ghdrsgkt5avs8zte65u"
 )
 
 // NewGenesisState creates a new GenesisState object
@@ -14,12 +17,10 @@ func NewGenesisState(users []*User) GenesisState {
 }
 
 func MakeAdmin() *User {
-	c, _ := sdk.AccAddressFromBech32("cosmos1qd4gsa4mlnpzmv4zsf9ghdrsgkt5avs8zte65u")
-	u, _ := sdk.AccAddressFromBech32("cosmos1qd4gsa4mlnpzmv4zsf9ghdrsgkt5avs8zte65u")
 
 	return &User{
-		Creator:     c.String(),
-		UserAccount: u.String(),
+		Creator:     c,
+		UserAccount: u,
 		IsAdmin:     true,
 		Name:        "Alice",
 	}

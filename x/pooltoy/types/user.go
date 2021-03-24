@@ -1,9 +1,10 @@
 package types
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 )
+
+var _ User = User{}
 
 func NewUser(
 	userAccount string,
@@ -20,7 +21,6 @@ func NewUser(
 	}
 }
 
-// GetBytes is a helper for serialising
-func (usr User) GetBytes() []byte {
-	return sdk.MustSortJSON(cdc.MustMarshalJSON(&usr))
-}
+//Marshal
+//Unmarshal
+//Validate

@@ -77,16 +77,16 @@ func (k Keeper) MintAndSend(ctx sdk.Context, msg *types.MsgMint) error {
 	if err != nil {
 		return err
 	}
-	mining := k.getMintHistory(ctx, a)
+	m := k.getMintHistory(ctx, a)
 	if k.isPresent(ctx, a) &&
-		time.Unix(int64(mining.Lasttime), 0).Add(k.Limit).UTC().After(time.Unix(mintTime, 0)) {
+		time.Unix(int64(m.Lasttime), 0).Add(k.Limit).UTC().After(time.Unix(mintTime, 0)) {
 		return types.ErrWithdrawTooOften
 	}
 
 	newCoin := sdk.NewCoin(msg.Denom, sdk.NewInt(k.amount))
-	mining.Tally = mining.Tally + k.amount
-	mining.Lasttime = mintTime
-	k.setMintHistory(ctx, a, mining)
+	m.Tally = m.Tally + k.amount
+	m.Lasttime = mintTime
+	k.setMintHistory(ctx, a, m)
 	k.Logger(ctx).Info("Mint coin: %s", newCoin)
 	newCoins := sdk.NewCoins(newCoin)
 	if err := k.BankKeeper.MintCoins(ctx, types.ModuleName, newCoins); err != nil {

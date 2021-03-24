@@ -5,16 +5,26 @@ import (
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 )
 
-func (k Keeper) InsertUser(ctx sdk.Context, user types.User) {
+func (k Keeper) InsertUser(ctx sdk.Context, user types.User) error {
 	key := []byte(types.UserPrefix + user.Id)
-	k.Set(ctx, key, []byte(types.UserPrefix), user, k.MarshalUser)
+	u, err := k.cdc.MarshalBinaryBare(&user)
+	if err != nil {
+		return err
+	}
+
+	k.SetUser(ctx, key, []byte(types.UserPrefix), u)
 	// validation already done in msg server
-	a, _ := sdk.AccAddressFromBech32(user.UserAccount)
+	a, err := sdk.AccAddressFromBech32(user.UserAccount)
+	if err != nil {
+		return err
+	}
+
 	acc := k.AccountKeeper.GetAccount(ctx, a)
 	if acc == nil {
 		acc = k.AccountKeeper.NewAccountWithAddress(ctx, a)
 		k.AccountKeeper.SetAccount(ctx, acc)
 	}
+	return nil
 }
 
 func (k Keeper) GetUserByAccAddress(ctx sdk.Context, queriedUserAccAddress sdk.AccAddress) types.User {
@@ -25,7 +35,6 @@ func (k Keeper) GetUserByAccAddress(ctx sdk.Context, queriedUserAccAddress sdk.A
 	iterator := sdk.KVStorePrefixIterator(store, []byte(types.UserPrefix))
 	for ; iterator.Valid(); iterator.Next() {
 		var user types.User
-		// TODO: check unmarshaler, MustUnmarshalBinaryBare?
 		k.cdc.MustUnmarshalBinaryBare(store.Get(iterator.Key()), &user)
 		if user.UserAccount == queriedUserAccAddress.String() {
 			queriedUser = user
@@ -44,10 +53,4 @@ func (k Keeper) ListUsers(ctx sdk.Context) []*types.User {
 		userList = append(userList, user)
 	}
 	return userList
-}
-
-func (k Keeper) MarshalUser(value interface{}) []byte {
-	var identifier types.User
-	bytes, _ := k.cdc.MarshalBinaryBare(&identifier)
-	return bytes
 }

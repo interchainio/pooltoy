@@ -38,7 +38,9 @@ func (k Keeper) CreateUser(c context.Context, msg *types.MsgCreateUser) (*types.
 	// creator must be an admin
 	if creator.IsAdmin || (u.IsAdmin && len(allUsers) == 0) {
 		// if yes
-		k.InsertUser(ctx, u)
+		if err := k.InsertUser(ctx, u); err != nil {
+			return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, fmt.Sprintf("error marshaling user %s", u.UserAccount))
+		}
 	} else {
 		// if no
 		// throw error

@@ -6,8 +6,6 @@ import (
 	"github.com/google/uuid"
 )
 
-var _ User = User{}
-
 func NewUser(
 	userAccount string,
 	isAdmin bool,

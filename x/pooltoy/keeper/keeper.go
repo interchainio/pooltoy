@@ -38,18 +38,61 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-// Set sets a value in the db with a prefixed key
-func (k Keeper) SetUser(ctx sdk.Context, key []byte, prefix []byte, user []byte) {
-	store := ctx.KVStore(k.storeKey)
-	store.Set(append(prefix, key...), user)
-}
-
-// GetAll values from with a prefix from the store
-func (k Keeper) GetAll(ctx sdk.Context, prefix []byte) sdk.Iterator {
-	store := ctx.KVStore(k.storeKey)
-	return sdk.KVStorePrefixIterator(store, prefix)
-}
-
 func (k Keeper) ListAccounts(ctx sdk.Context) []authtypes.AccountI {
 	return k.AccountKeeper.GetAllAccounts(ctx)
+}
+
+func (k Keeper) InsertUser(ctx sdk.Context, user types.User) error {
+	// TODO: use account address as key
+	// then we can remove account address from U
+	key := []byte(types.UserPrefix + user.Id)
+
+	u, err := k.cdc.MarshalBinaryBare(&user)
+	if err != nil {
+		return err
+	}
+	p := []byte(types.UserPrefix)
+	store := ctx.KVStore(k.storeKey)
+	store.Set(append(p, key...), u)
+
+	// validation already done in msg server
+	a, err := sdk.AccAddressFromBech32(user.UserAccount)
+	if err != nil {
+		return err
+	}
+
+	acc := k.AccountKeeper.GetAccount(ctx, a)
+	if acc == nil {
+		acc = k.AccountKeeper.NewAccountWithAddress(ctx, a)
+		k.AccountKeeper.SetAccount(ctx, acc)
+	}
+	return nil
+}
+
+func (k Keeper) GetUserByAccAddress(ctx sdk.Context, queriedUserAccAddress sdk.AccAddress) types.User {
+	store := ctx.KVStore(k.storeKey)
+
+	var queriedUser types.User
+
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.UserPrefix))
+	for ; iterator.Valid(); iterator.Next() {
+		var user types.User
+		k.cdc.MustUnmarshalBinaryBare(store.Get(iterator.Key()), &user)
+		if user.UserAccount == queriedUserAccAddress.String() {
+			queriedUser = user
+		}
+	}
+	return queriedUser
+}
+
+func (k Keeper) ListUsers(ctx sdk.Context) []*types.User {
+	var userList []*types.User
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.UserPrefix))
+	for ; iterator.Valid(); iterator.Next() {
+		var user *types.User
+		k.cdc.MustUnmarshalBinaryBare(store.Get(iterator.Key()), user)
+		userList = append(userList, user)
+	}
+	return userList
 }

@@ -368,7 +368,7 @@ func NewPooltoyApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(
-		NewAnteHandler(
+		ante.NewAnteHandler(
 			app.AccountKeeper,
 			app.BankKeeper,
 			ante.DefaultSigVerificationGasConsumer,

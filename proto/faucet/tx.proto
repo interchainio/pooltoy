@@ -1,0 +1,20 @@
+syntax = "proto3";
+package faucet;
+
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "google/protobuf/any.proto";
+
+option go_package = "github.com/interchainberlin/pooltoy/x/faucet/types";
+
+service Msg {
+ rpc Mint(MsgMint) returns (MsgMintResponse);
+}
+
+message MsgMint {
+  string sender = 1;
+  string minter = 2;
+  string denom = 3;
+}
+
+message MsgMintResponse {}

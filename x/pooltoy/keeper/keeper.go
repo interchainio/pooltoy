@@ -3,35 +3,34 @@ package keeper
 import (
 	"fmt"
 
-	"github.com/tendermint/tendermint/libs/log"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth"
-	"github.com/cosmos/cosmos-sdk/x/auth/exported"
-	"github.com/cosmos/cosmos-sdk/x/bank"
+	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	"github.com/tendermint/tendermint/libs/log"
 )
+
+// can just use codec marshal binary
 
 // Keeper of the pooltoy store
 type Keeper struct {
-	CoinKeeper    bank.Keeper
-	accountKeeper auth.AccountKeeper
+	cdc           codec.BinaryMarshaler
 	storeKey      sdk.StoreKey
-	Cdc           *codec.Codec
-	// paramspace types.ParamSubspace
+	AccountKeeper authkeeper.AccountKeeper
 }
 
 // NewKeeper creates a pooltoy keeper
-func NewKeeper(coinKeeper bank.Keeper, accountKeeper auth.AccountKeeper, cdc *codec.Codec, key sdk.StoreKey) Keeper {
-	keeper := Keeper{
-		CoinKeeper:    coinKeeper,
-		accountKeeper: accountKeeper,
-		storeKey:      key,
-		Cdc:           cdc,
-		// paramspace: paramspace.WithKeyTable(types.ParamKeyTable()),
+func NewKeeper(
+	cdc codec.BinaryMarshaler,
+	storeKey sdk.StoreKey,
+	accountKeeper authkeeper.AccountKeeper,
+) Keeper {
+	return Keeper{
+		cdc:           cdc,
+		storeKey:      storeKey,
+		AccountKeeper: accountKeeper,
 	}
-	return keeper
 }
 
 // Logger returns a module-specific logger.
@@ -39,29 +38,61 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 	return ctx.Logger().With("module", fmt.Sprintf("x/%s", types.ModuleName))
 }
 
-func (k Keeper) ListAccounts(ctx sdk.Context) []exported.Account {
-	return k.accountKeeper.GetAllAccounts(ctx)
+func (k Keeper) ListAccounts(ctx sdk.Context) []authtypes.AccountI {
+	return k.AccountKeeper.GetAllAccounts(ctx)
 }
 
-// Get returns the pubkey from the adddress-pubkey relation
-// func (k Keeper) Get(ctx sdk.Context, key string) (/* TODO: Fill out this type */, error) {
-// 	store := ctx.KVStore(k.storeKey)
-// 	var item /* TODO: Fill out this type */
-// 	byteKey := []byte(key)
-// 	err := k.cdc.UnmarshalBinaryLengthPrefixed(store.Get(byteKey), &item)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return item, nil
-// }
+func (k Keeper) InsertUser(ctx sdk.Context, user types.User) error {
+	// TODO: use account address as key
+	// then we can remove account address from U
+	key := []byte(types.UserPrefix + user.Id)
 
-// func (k Keeper) set(ctx sdk.Context, key string, value /* TODO: fill out this type */ ) {
-// 	store := ctx.KVStore(k.storeKey)
-// 	bz := k.cdc.MustMarshalBinaryLengthPrefixed(value)
-// 	store.Set([]byte(key), bz)
-// }
+	u, err := k.cdc.MarshalBinaryBare(&user)
+	if err != nil {
+		return err
+	}
+	p := []byte(types.UserPrefix)
+	store := ctx.KVStore(k.storeKey)
+	store.Set(append(p, key...), u)
 
-// func (k Keeper) delete(ctx sdk.Context, key string) {
-// 	store := ctx.KVStore(k.storeKey)
-// 	store.Delete([]byte(key))
-// }
+	// validation already done in msg server
+	a, err := sdk.AccAddressFromBech32(user.UserAccount)
+	if err != nil {
+		return err
+	}
+
+	acc := k.AccountKeeper.GetAccount(ctx, a)
+	if acc == nil {
+		acc = k.AccountKeeper.NewAccountWithAddress(ctx, a)
+		k.AccountKeeper.SetAccount(ctx, acc)
+	}
+	return nil
+}
+
+func (k Keeper) GetUserByAccAddress(ctx sdk.Context, queriedUserAccAddress sdk.AccAddress) types.User {
+	store := ctx.KVStore(k.storeKey)
+
+	var queriedUser types.User
+
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.UserPrefix))
+	for ; iterator.Valid(); iterator.Next() {
+		var user types.User
+		k.cdc.MustUnmarshalBinaryBare(store.Get(iterator.Key()), &user)
+		if user.UserAccount == queriedUserAccAddress.String() {
+			queriedUser = user
+		}
+	}
+	return queriedUser
+}
+
+func (k Keeper) ListUsers(ctx sdk.Context) []*types.User {
+	var userList []*types.User
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.UserPrefix))
+	for ; iterator.Valid(); iterator.Next() {
+		var user *types.User
+		k.cdc.MustUnmarshalBinaryBare(store.Get(iterator.Key()), user)
+		userList = append(userList, user)
+	}
+	return userList
+}

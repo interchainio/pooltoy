@@ -1,5 +1,5 @@
 #!/bin/bash
-# rm -r ~/.pooltoycli
+rm -r ~/.pooltoycli
 rm -r ~/.pooltoyd
 
 pooltoyd init mynode --chain-id pooltoy-4

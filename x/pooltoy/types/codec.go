@@ -1,21 +1,13 @@
 package types
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
-// RegisterCodec registers concrete types on codec
-func RegisterCodec(cdc *codec.Codec) {
-  // this line is used by starport scaffolding
-		cdc.RegisterConcrete(MsgCreateUser{}, "pooltoy/CreateUser", nil)
-}
+func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
+	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)
+	registry.RegisterImplementations((*sdk.Msg)(nil), &MsgCreateUser{})
 
-// ModuleCdc defines the module codec
-var ModuleCdc *codec.Codec
-
-func init() {
-	ModuleCdc = codec.New()
-	RegisterCodec(ModuleCdc)
-	codec.RegisterCrypto(ModuleCdc)
-	ModuleCdc.Seal()
 }

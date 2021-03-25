@@ -1,0 +1,17 @@
+syntax = "proto3";
+package pooltoy;
+
+option go_package = "github.com/interchainberlin/pooltoy/x/pooltoy/types";
+import "pooltoy/user.proto";
+
+
+service Msg {
+ rpc CreateUser(MsgCreateUser) returns (MsgCreateUserResponse) {}
+}
+
+message MsgCreateUser {
+  User user = 1;
+  string creator = 2;
+}
+
+message MsgCreateUserResponse {}

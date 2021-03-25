@@ -1,0 +1,13 @@
+syntax = "proto3";
+package pooltoy;
+
+option go_package = "github.com/interchainberlin/pooltoy/x/pooltoy/types";
+
+message User {
+  string id           = 1;
+  string creator      = 2;
+  string user_account = 3;
+  bool   is_admin     = 4;
+  string name         = 5;
+  string email        = 6;
+}

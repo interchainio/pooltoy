@@ -17,7 +17,6 @@ all: install
 
 install: go.sum
 		go install $(BUILD_FLAGS) ./cmd/pooltoyd
-		go install $(BUILD_FLAGS) ./cmd/pooltoycli
 
 go.sum: go.mod
 		@echo "--> Ensure dependencies have not been modified"

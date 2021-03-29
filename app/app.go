@@ -14,7 +14,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
-	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -28,16 +27,26 @@ import (
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/cosmos/cosmos-sdk/x/capability"
+	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
+	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	distr "github.com/cosmos/cosmos-sdk/x/distribution"
 	distrclient "github.com/cosmos/cosmos-sdk/x/distribution/client"
 	distrkeeper "github.com/cosmos/cosmos-sdk/x/distribution/keeper"
 	distrtypes "github.com/cosmos/cosmos-sdk/x/distribution/types"
+	"github.com/cosmos/cosmos-sdk/x/evidence"
+	evidencekeeper "github.com/cosmos/cosmos-sdk/x/evidence/keeper"
+	evidencetypes "github.com/cosmos/cosmos-sdk/x/evidence/types"
 	"github.com/cosmos/cosmos-sdk/x/genutil"
-	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
 	"github.com/cosmos/cosmos-sdk/x/gov"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	"github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer"
+	ibctransferkeeper "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/keeper"
+	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
 	ibc "github.com/cosmos/cosmos-sdk/x/ibc/core"
+	porttypes "github.com/cosmos/cosmos-sdk/x/ibc/core/05-port/types"
+	ibchost "github.com/cosmos/cosmos-sdk/x/ibc/core/24-host"
+	ibckeeper "github.com/cosmos/cosmos-sdk/x/ibc/core/keeper"
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 	"github.com/cosmos/cosmos-sdk/x/params"
 	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
@@ -79,6 +88,8 @@ var (
 		genutil.AppModuleBasic{},
 		capability.AppModuleBasic{},
 		ibc.AppModuleBasic{},
+		evidence.AppModuleBasic{},
+		transfer.AppModuleBasic{},
 		auth.AppModuleBasic{},
 		bank.AppModuleBasic{},
 		staking.AppModuleBasic{},
@@ -103,6 +114,7 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		faucettypes.ModuleName:         {authtypes.Minter},
+		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 	}
 
 	allowedReceivingModAcc = map[string]bool{
@@ -110,7 +122,7 @@ var (
 	}
 )
 
-var _ simapp.App = (*PooltoyApp)(nil)
+// var _ simapp.App = (*PooltoyApp)(nil)
 
 type PooltoyApp struct {
 	*baseapp.BaseApp
@@ -122,23 +134,34 @@ type PooltoyApp struct {
 	invCheckPeriod uint
 
 	// keys
-	keys  map[string]*sdk.KVStoreKey
-	tKeys map[string]*sdk.TransientStoreKey
+	keys    map[string]*sdk.KVStoreKey
+	tKeys   map[string]*sdk.TransientStoreKey
+	memKeys map[string]*sdk.MemoryStoreKey
 
 	// keepers
-	ParamsKeeper   paramskeeper.Keeper
-	AccountKeeper  authkeeper.AccountKeeper
-	BankKeeper     bankkeeper.Keeper
-	StakingKeeper  stakingkeeper.Keeper
-	SlashingKeeper slashingkeeper.Keeper
-	GovKeeper      govkeeper.Keeper
-	UpgradeKeeper  upgradekeeper.Keeper
-	DistrKeeper    distrkeeper.Keeper
-	PooltoyKeeper  pooltoykeeper.Keeper
-	FaucetKeeper   faucetkeeper.Keeper
+	ParamsKeeper     paramskeeper.Keeper
+	AccountKeeper    authkeeper.AccountKeeper
+	BankKeeper       bankkeeper.Keeper
+	CapabilityKeeper *capabilitykeeper.Keeper
+	StakingKeeper    stakingkeeper.Keeper
+	SlashingKeeper   slashingkeeper.Keeper
+	GovKeeper        govkeeper.Keeper
+	UpgradeKeeper    upgradekeeper.Keeper
+	DistrKeeper      distrkeeper.Keeper
+	PooltoyKeeper    pooltoykeeper.Keeper
+	FaucetKeeper     faucetkeeper.Keeper
+
+	//IBC keepers
+	IBCKeeper      *ibckeeper.Keeper        // IBC Keeper must be a pointer in the app, so we can SetRouter on it correctly
+	EvidenceKeeper *evidencekeeper.Keeper   // required to set up the client misbehaviour route
+	TransferKeeper ibctransferkeeper.Keeper // for cross-chain fungible token transfers
+
+	// make scoped keepers public for test purposes
+	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
+	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 
 	mm *module.Manager
-	sm *module.SimulationManager
+	// sm *module.SimulationManager
 }
 
 func NewPooltoyApp(
@@ -177,6 +200,8 @@ func NewPooltoyApp(
 		paramstypes.TStoreKey,
 	)
 
+	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
+
 	app := &PooltoyApp{
 		BaseApp:        bApp,
 		invCheckPeriod: invCheckPeriod,
@@ -212,6 +237,46 @@ func NewPooltoyApp(
 		app.AccountKeeper,
 		app.GetSubspace(banktypes.ModuleName),
 		app.BlockedAddrs(),
+	)
+
+	// add capability keeper and ScopeToModule for ibc module
+	app.CapabilityKeeper = capabilitykeeper.NewKeeper(
+		appCodec,
+		keys[capabilitytypes.StoreKey],
+		memKeys[capabilitytypes.MemStoreKey],
+	)
+
+	// grant capabilities for the ibc and ibc-transfer modules
+	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
+	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
+
+	// Create IBC Keeper
+	app.IBCKeeper = ibckeeper.NewKeeper(
+		appCodec,
+		keys[ibchost.StoreKey],
+		app.GetSubspace(ibchost.ModuleName),
+		app.StakingKeeper,
+		scopedIBCKeeper,
+	)
+
+	// Create Transfer Keepers
+	app.TransferKeeper = ibctransferkeeper.NewKeeper(
+		appCodec,
+		keys[ibctransfertypes.StoreKey],
+		app.GetSubspace(ibctransfertypes.ModuleName),
+		app.IBCKeeper.ChannelKeeper,
+		&app.IBCKeeper.PortKeeper,
+		app.AccountKeeper,
+		app.BankKeeper,
+		scopedTransferKeeper,
+	)
+
+	// Create evidence Keeper for to register the IBC light client misbehaviour evidence route
+	app.EvidenceKeeper = evidencekeeper.NewKeeper(
+		appCodec,
+		keys[evidencetypes.StoreKey],
+		&app.StakingKeeper,
+		app.SlashingKeeper,
 	)
 
 	stakingKeeper := stakingkeeper.NewKeeper(
@@ -280,6 +345,8 @@ func NewPooltoyApp(
 		govRouter,
 	)
 
+	transferModule := transfer.NewAppModule(app.TransferKeeper)
+
 	app.mm = module.NewManager(
 		genutil.NewAppModule(
 			app.AccountKeeper,
@@ -328,34 +395,104 @@ func NewPooltoyApp(
 			app.FaucetKeeper,
 		),
 		upgrade.NewAppModule(app.UpgradeKeeper),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
+		evidence.NewAppModule(*app.EvidenceKeeper),
+		ibc.NewAppModule(app.IBCKeeper),
+		transferModule,
 	)
 
-	app.mm.SetOrderBeginBlockers(
-		upgradetypes.ModuleName,
-		distrtypes.ModuleName,
-		slashingtypes.ModuleName,
-	)
-	app.mm.SetOrderEndBlockers(
-		stakingtypes.ModuleName,
-		govtypes.ModuleName,
-	)
+	// TODO: Generate Genesis State in pooltoy / faucet to finish simapp
+	// app.sm = module.NewSimulationManager(
+	// 	auth.NewAppModule(
+	// 		appCodec,
+	// 		app.AccountKeeper,
+	// 		nil,
+	// 	),
+	// 	distr.NewAppModule(
+	// 		appCodec,
+	// 		app.DistrKeeper,
+	// 		app.AccountKeeper,
+	// 		app.BankKeeper,
+	// 		app.StakingKeeper,
+	// 	),
+	// 	slashing.NewAppModule(
+	// 		appCodec,
+	// 		app.SlashingKeeper,
+	// 		app.AccountKeeper,
+	// 		app.BankKeeper,
+	// 		app.StakingKeeper,
+	// 	),
+	// 	staking.NewAppModule(
+	// 		appCodec,
+	// 		app.StakingKeeper,
+	// 		app.AccountKeeper,
+	// 		app.BankKeeper,
+	// 	),
+	// 	gov.NewAppModule(
+	// 		appCodec,
+	// 		app.GovKeeper,
+	// 		app.AccountKeeper,
+	// 		app.BankKeeper,
+	// 	),
+	// 	pooltoy.NewAppModule(
+	// 		appCodec,
+	// 		app.PooltoyKeeper,
+	// 		app.BankKeeper,
+	// 	),
 
-	app.mm.SetOrderInitGenesis(
-		distrtypes.ModuleName,
-		stakingtypes.ModuleName,
-		authtypes.ModuleName,
-		banktypes.ModuleName,
-		slashingtypes.ModuleName,
-		govtypes.ModuleName,
-		pooltoytypes.ModuleName,
-		genutiltypes.ModuleName,
-	)
+	// 	faucet.NewAppModule(
+	// 		app.FaucetKeeper,
+	// 	),
+	// 	capability.NewAppModule(appCodec, *app.CapabilityKeeper),
+	// 	evidence.NewAppModule(*app.EvidenceKeeper),
+	// 	ibc.NewAppModule(app.IBCKeeper),
+	// 	transferModule,
+	// )
 
-	app.mm.RegisterRoutes(
-		app.Router(),
-		app.QueryRouter(),
-		encodingConfig.Amino,
-	)
+	// app.mm.SetOrderBeginBlockers(
+	// 	upgradetypes.ModuleName,
+	// 	distrtypes.ModuleName,
+	// 	slashingtypes.ModuleName,
+	// )
+	// app.mm.SetOrderEndBlockers(
+	// 	stakingtypes.ModuleName,
+	// 	govtypes.ModuleName,
+	// )
+
+	// app.mm.SetOrderInitGenesis(
+	// 	distrtypes.ModuleName,
+	// 	stakingtypes.ModuleName,
+	// 	authtypes.ModuleName,
+	// 	banktypes.ModuleName,
+	// 	slashingtypes.ModuleName,
+	// 	govtypes.ModuleName,
+	// 	pooltoytypes.ModuleName,
+	// 	genutiltypes.ModuleName,
+	// )
+
+	// app.mm.RegisterRoutes(
+	// 	app.Router(),
+	// 	app.QueryRouter(),
+	// 	encodingConfig.Amino,
+	// )
+
+	// Create static IBC router, add ibc-tranfer module route, then set and seal it
+	ibcRouter := porttypes.NewRouter()
+	ibcRouter.AddRoute(ibctransfertypes.ModuleName, transferModule)
+	// Setting Router will finalize all routes by sealing router
+	// No more routes can be added
+	app.IBCKeeper.SetRouter(ibcRouter)
+
+	// TODO: do we need a static Evidence router?
+	// create static Evidence routers
+	// evidenceRouter := evidencetypes.NewRouter().
+	// 	// add IBC ClientMisbehaviour evidence handler
+	// 	AddRoute(ibcclient.RouterKey, ibcclient.HandlerClientMisbehaviour(app.IBCKeeper.ClientKeeper))
+
+	// // Setting Router will finalize all routes by sealing router
+	// // No more routes can be added
+	// evidenceKeeper.SetRouter(evidenceRouter)
+
 	app.mm.RegisterServices(
 		module.NewConfigurator(app.MsgServiceRouter(), app.GRPCQueryRouter()),
 	)
@@ -426,9 +563,9 @@ func (app *PooltoyApp) GetSubspace(moduleName string) paramstypes.Subspace {
 	return subspace
 }
 
-func (app *PooltoyApp) SimulationManager() *module.SimulationManager {
-	return app.sm
-}
+// func (app *PooltoyApp) SimulationManager() *module.SimulationManager {
+// 	return app.sm
+// }
 
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.

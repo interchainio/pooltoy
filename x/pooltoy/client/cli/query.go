@@ -32,6 +32,7 @@ func queryListUsers() *cobra.Command {
 		Short: "list all users",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Println("inside query")
 			ctx, err := client.GetClientQueryContext(cmd)
 			if err != nil {
 				return err

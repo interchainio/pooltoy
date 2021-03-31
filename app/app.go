@@ -487,14 +487,6 @@ func NewPooltoyApp(
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	// TODO: do we need a static Evidence router?
-	// create static Evidence routers
-	// evidenceRouter := evidencetypes.NewRouter().
-	// 	// add IBC ClientMisbehaviour evidence handler
-	// 	AddRoute(ibcclient.RouterKey, ibcclient.HandlerClientMisbehaviour(app.IBCKeeper.ClientKeeper))
-
-	// // Setting Router will finalize all routes by sealing router
-	// // No more routes can be added
-	// evidenceKeeper.SetRouter(evidenceRouter)
 
 	app.mm.RegisterServices(
 		module.NewConfigurator(app.MsgServiceRouter(), app.GRPCQueryRouter()),

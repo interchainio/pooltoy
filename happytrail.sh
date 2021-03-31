@@ -5,40 +5,12 @@
 # pooltoycli tx send me $(pooltoycli keys show who -a) 1token --from me | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx
 
 echo "make alice admin by alice"
-pooltoycli tx pooltoy create-user $(pooltoycli keys show alice -a) true billy billy@interchain.berlin --from alice -y
-
-
-
-
-# | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
-
-
-
-
-
-
-
-
+pooltoycli tx pooltoy create-user $(pooltoycli keys show alice -a) true billy billy@interchain.berlin --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
 
 echo "make bob admin by alice"
 pooltoycli tx pooltoy create-user $(pooltoycli keys show bob -a) true sam sam@interchain.berlin --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
 # echo "make carol non-admin by bob"
 # pooltoycli tx pooltoy create-user $(pooltoycli keys show carol -a) false marko marko@interchain.berlin --from bob -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 # # this one should fail
 # echo "should fail"
@@ -55,15 +27,6 @@ pooltoycli q faucet when-brrr $(pooltoycli keys show alice -a)
 
 echo "can bob send to alice?"
 pooltoycli tx send bob $(pooltoycli keys show alice -a) 1🚀 --from bob -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
-
-
-
-
-
-
-
-
-
 
 # echo "should fail"
 # pooltoycli tx faucet mintfor $(pooltoycli keys show carol -a) 🚀 --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"

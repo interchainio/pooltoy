@@ -1,7 +1,6 @@
 #!/bin/bash
-POOLTOY=pooltoyd
-rm -r ~/.pooltoyd
-
+rm -rf ~/.pooltoycli
+rm -rf ~/.pooltoyd
 
 pooltoyd init mynode --chain-id pooltoy-4
 

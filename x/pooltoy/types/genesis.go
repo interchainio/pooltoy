@@ -17,7 +17,6 @@ func NewGenesisState(users []*User) GenesisState {
 }
 
 func MakeAdmin() *User {
-
 	return &User{
 		Creator:     c,
 		UserAccount: u,

@@ -18,7 +18,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
 	"github.com/cosmos/cosmos-sdk/x/auth"
-	ante "github.com/cosmos/cosmos-sdk/x/auth/ante"
+	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
@@ -134,9 +134,8 @@ type PooltoyApp struct {
 	invCheckPeriod uint
 
 	// keys
-	keys    map[string]*sdk.KVStoreKey
-	tKeys   map[string]*sdk.TransientStoreKey
-	memKeys map[string]*sdk.MemoryStoreKey
+	keys  map[string]*sdk.KVStoreKey
+	tKeys map[string]*sdk.TransientStoreKey
 
 	// keepers
 	ParamsKeeper     paramskeeper.Keeper
@@ -346,7 +345,6 @@ func NewPooltoyApp(
 	)
 
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
-
 	app.mm = module.NewManager(
 		genutil.NewAppModule(
 			app.AccountKeeper,
@@ -358,6 +356,11 @@ func NewPooltoyApp(
 			appCodec,
 			app.AccountKeeper,
 			nil,
+		),
+		bank.NewAppModule(
+			appCodec,
+			app.BankKeeper,
+			app.AccountKeeper,
 		),
 		distr.NewAppModule(
 			appCodec,
@@ -505,7 +508,7 @@ func NewPooltoyApp(
 	app.SetBeginBlocker(app.BeginBlocker)
 	app.SetEndBlocker(app.EndBlocker)
 	app.SetAnteHandler(
-		ante.NewAnteHandler(
+		NewAnteHandler(
 			app.AccountKeeper,
 			app.BankKeeper,
 			ante.DefaultSigVerificationGasConsumer,

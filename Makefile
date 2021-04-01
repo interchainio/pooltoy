@@ -4,23 +4,20 @@ DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bu
 VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
 COMMIT := $(shell git log -1 --format='%H')
 
-# TODO: Update the ldflags with the app, client & server names
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=NewApp \
-	-X github.com/cosmos/cosmos-sdk/version.ServerName=pooltoyd \
-	-X github.com/cosmos/cosmos-sdk/version.ClientName=pooltoycli \
-	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) 
 
-BUILD_FLAGS := -ldflags '$(ldflags)'
+###############################################################################
+###                           Install                                       ###
+###############################################################################
 
 all: install
 
 install: go.sum
-		go install $(BUILD_FLAGS) ./cmd/pooltoyd
+	@echo "--> installing pooltoyd"
+	@go install ./cmd/pooltoyd
 
 go.sum: go.mod
-		@echo "--> Ensure dependencies have not been modified"
-		GO111MODULE=on go mod verify
+	@echo "--> Ensure dependencies have not been modified"
+	GO111MODULE=on go mod verify
 
 # Uncomment when you have some tests
 # test:
@@ -33,7 +30,9 @@ lint:
 	@go mod verify
 .PHONY: lint
 
-#PROTOBUF
+###############################################################################
+###                                Protobuf                                 ###
+###############################################################################
 
 proto-all: proto-format proto-lint proto-gen
 

@@ -6,5 +6,5 @@ import (
 
 var (
 	ErrInvalid    = sdkerrors.Register(ModuleName, 1, "custom error message")
-	ErrUserExists = sdkerrors.Register(ModuleName, 1, "user exists")
+	ErrUserExists = sdkerrors.Register(ModuleName, 2, "user exists")
 )

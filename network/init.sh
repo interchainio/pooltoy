@@ -3,9 +3,9 @@
 # Configure predetermined settings
 # val1: cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am
 # val2: cosmos17dtl0mjt3t77kpuhg2edqzjpszulwhgzuj9ljs
-BINARY=pooltoyd
-CLI=pooltoycli
-CHAIN_DIR=./dat
+BINARY=pooltoy
+CLI=pooltoy
+CHAIN_DIR=./data
 CHAINID_1=test-1
 CHAINID_2=test-2
 MNEMONIC_1="alley afraid soup fall idea toss can goose become valve initial strong forward bright dish figure check leopard decide warfare hub unusual join cart"

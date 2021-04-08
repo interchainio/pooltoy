@@ -178,7 +178,7 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		panic(err)
 	}
 
-	return app.NewPooltoyApp(
+	return app.New(
 		logger, db, traceStore, true, skipUpgradeHeights,
 		cast.ToString(appOpts.Get(flags.FlagHome)),
 		cast.ToUint(appOpts.Get(server.FlagInvCheckPeriod)),
@@ -196,6 +196,53 @@ func (a appCreator) newApp(logger log.Logger, db dbm.DB, traceStore io.Writer, a
 		baseapp.SetSnapshotInterval(cast.ToUint64(appOpts.Get(server.FlagStateSyncSnapshotInterval))),
 		baseapp.SetSnapshotKeepRecent(cast.ToUint32(appOpts.Get(server.FlagStateSyncSnapshotKeepRecent))),
 	)
+}
+
+// appExport creates a new simapp (optionally at a given height)
+func (a appCreator) appExport(
+	logger log.Logger, db dbm.DB, traceStore io.Writer, height int64, forZeroHeight bool, jailAllowedAddrs []string,
+	appOpts servertypes.AppOptions) (servertypes.ExportedApp, error) {
+
+	var anApp *app.App
+
+	homePath, ok := appOpts.Get(flags.FlagHome).(string)
+	if !ok || homePath == "" {
+		return servertypes.ExportedApp{}, errors.New("application home not set")
+	}
+
+	if height != -1 {
+		anApp = app.New(
+			logger,
+			db,
+			traceStore,
+			false,
+			map[int64]bool{},
+			homePath,
+			uint(1),
+			a.encCfg,
+			// this line is used by starport scaffolding # stargate/root/exportArgument
+			appOpts,
+		)
+
+		if err := anApp.LoadHeight(height); err != nil {
+			return servertypes.ExportedApp{}, err
+		}
+	} else {
+		anApp = app.New(
+			logger,
+			db,
+			traceStore,
+			true,
+			map[int64]bool{},
+			homePath,
+			uint(1),
+			a.encCfg,
+			// this line is used by starport scaffolding # stargate/root/noHeightExportArgument
+			appOpts,
+		)
+	}
+
+	return anApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs)
 }
 
 func (a appCreator) createSimappAndExport(

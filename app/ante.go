@@ -1,8 +1,6 @@
 package app
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	ante "github.com/cosmos/cosmos-sdk/x/auth/ante"
@@ -25,7 +23,6 @@ func NewAccountExistsCheckDecorator(ak authkeeper.AccountKeeper, bk types.BankKe
 }
 
 func (ad AccountExistsCheckDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, simulate bool, next sdk.AnteHandler) (newCtx sdk.Context, err error) {
-	fmt.Println("checking if to address exists")
 	msgs := tx.GetMsgs()
 	for _, m := range msgs {
 		// won't catch ibc messages which is fine bc it doesn't matter if dest account is in another chain

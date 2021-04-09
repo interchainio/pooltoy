@@ -90,11 +90,11 @@ import (
 
 	appparams "github.com/interchainberlin/pooltoy/app/params"
 	"github.com/interchainberlin/pooltoy/x/faucet"
-	faucetkeeper "github.com/interchainberlin/pooltoy/x/faucet/keeper"
-	faucettypes "github.com/interchainberlin/pooltoy/x/faucet/types"
 	"github.com/interchainberlin/pooltoy/x/pooltoy"
-	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
 	pooltoytypes "github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	faucettypes "github.com/interchainberlin/pooltoy/x/faucet/types"
+	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
+	faucetkeeper "github.com/interchainberlin/pooltoy/x/faucet/keeper"
 )
 
 const Name = "pooltoy"
@@ -214,8 +214,8 @@ type App struct {
 	ScopedTransferKeeper   capabilitykeeper.ScopedKeeper
 	ScopedIbcAccountKeeper capabilitykeeper.ScopedKeeper
 
-	PooltoyKeeper pooltoykeeper.Keeper
-	FaucetKeeper  faucetkeeper.Keeper
+	PooltoyKeeper    pooltoykeeper.Keeper
+	FaucetKeeper     faucetkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
@@ -329,6 +329,7 @@ func New(
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
+
 
 	app.PooltoyKeeper = pooltoykeeper.NewKeeper(
 		appCodec,
@@ -635,6 +636,7 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 
 	return paramsKeeper
 }
+
 
 func (*App) OnTxSucceeded(ctx sdk.Context, sourcePort, sourceChannel string, txHash []byte, txBytes []byte) {
 }

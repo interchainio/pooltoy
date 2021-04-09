@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Configure predetermined settings
-# val1: cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am
-# val2: cosmos17dtl0mjt3t77kpuhg2edqzjpszulwhgzuj9ljs
+# alice: cosmos1mjk79fjjgpplak5wq838w0yd982gzkyfrk07am
+# bob: cosmos17dtl0mjt3t77kpuhg2edqzjpszulwhgzuj9ljs
 BINARY=pooltoy
 CLI=pooltoy
 CHAIN_DIR=./data
@@ -46,14 +46,14 @@ $BINARY init test --home $CHAIN_DIR/$CHAINID_1 --chain-id=$CHAINID_1
 $BINARY init test --home $CHAIN_DIR/$CHAINID_2 --chain-id=$CHAINID_2
 
 echo "Adding genesis accounts..."
-echo $MNEMONIC_1 | $CLI keys add val1 --home $CHAIN_DIR/$CHAINID_1 --recover --keyring-backend=test 
-echo $MNEMONIC_2 | $CLI keys add val2 --home $CHAIN_DIR/$CHAINID_2 --recover --keyring-backend=test 
-$BINARY add-genesis-account $($CLI --home $CHAIN_DIR/$CHAINID_1 keys show val1 --keyring-backend test -a) 100000000000stake  --home $CHAIN_DIR/$CHAINID_1
-$BINARY add-genesis-account $($CLI --home $CHAIN_DIR/$CHAINID_2 keys show val2 --keyring-backend test -a) 100000000000stake  --home $CHAIN_DIR/$CHAINID_2
+echo $MNEMONIC_1 | $CLI keys add alice --home $CHAIN_DIR/$CHAINID_1 --recover --keyring-backend=test 
+echo $MNEMONIC_2 | $CLI keys add bob --home $CHAIN_DIR/$CHAINID_2 --recover --keyring-backend=test 
+$BINARY add-genesis-account $($CLI --home $CHAIN_DIR/$CHAINID_1 keys show alice --keyring-backend test -a) 100000000000stake  --home $CHAIN_DIR/$CHAINID_1
+$BINARY add-genesis-account $($CLI --home $CHAIN_DIR/$CHAINID_2 keys show bob --keyring-backend test -a) 100000000000stake  --home $CHAIN_DIR/$CHAINID_2
 
 echo "Creating and collecting gentx..."
-$BINARY gentx val1 7000000000stake --home $CHAIN_DIR/$CHAINID_1 --chain-id=$CHAINID_1 --keyring-backend test
-$BINARY gentx val2 7000000000stake --home $CHAIN_DIR/$CHAINID_2 --chain-id $CHAINID_2 --keyring-backend test
+$BINARY gentx alice 7000000000stake --home $CHAIN_DIR/$CHAINID_1 --chain-id=$CHAINID_1 --keyring-backend test
+$BINARY gentx bob 7000000000stake --home $CHAIN_DIR/$CHAINID_2 --chain-id $CHAINID_2 --keyring-backend test
 $BINARY collect-gentxs --home $CHAIN_DIR/$CHAINID_1
 $BINARY collect-gentxs --home $CHAIN_DIR/$CHAINID_2
 
@@ -83,5 +83,3 @@ $BINARY start --home $CHAIN_DIR/$CHAINID_1 --pruning=nothing --grpc.address="0.0
 echo "Starting $CHAINID_1 in $CHAIN_DIR..."
 echo "Creating log file at $CHAIN_DIR/$CHAINID_1.log"
 $BINARY start --home $CHAIN_DIR/$CHAINID_2 --pruning=nothing --grpc.address="0.0.0.0:$GRPCPORT_2" > $CHAIN_DIR/$CHAINID_2.log 2>&1 &
-
-

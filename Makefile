@@ -3,7 +3,7 @@ DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bu
 
 
 ###############################################################################
-###                           Install                                       ###
+###                     Install & Clean                                     ###
 ###############################################################################
 
 all: install
@@ -25,6 +25,10 @@ lint:
 	@echo "--> Running linter"
 	@golangci-lint run
 	@go mod verify
+
+clean:
+	sh ./scripts/clean.sh
+
 .PHONY: lint
 
 ###############################################################################

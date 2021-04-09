@@ -1,6 +1,14 @@
 DOCKER := $(shell which docker)
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
 
+# TODO: Update the ldflags with the app, client & server names
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=NewApp \
+	-X github.com/cosmos/cosmos-sdk/version.ServerName=pooltoyd \
+	-X github.com/cosmos/cosmos-sdk/version.ClientName=pooltoycli \
+	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) 
+
+BUILD_FLAGS := -ldflags '$(ldflags)'
 
 ###############################################################################
 ###                     Install & Clean                                     ###
@@ -10,7 +18,7 @@ all: install
 
 install: go.sum
 	@echo "--> installing pooltoy"
-	@go install -v -mod=readonly ./...
+	@go install $(BUILD_FLAGS) -v -mod=readonly ./cmd/pooltoy 
 
 go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"

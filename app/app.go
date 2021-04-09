@@ -22,6 +22,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server/api"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
+	"github.com/cosmos/cosmos-sdk/simapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -29,6 +30,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 	authrest "github.com/cosmos/cosmos-sdk/x/auth/client/rest"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
+	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
@@ -81,20 +83,16 @@ import (
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	// appparams "github.com/cosmos/interchain-accounts/app/params"
-	// ibcaccount "github.com/cosmos/interchain-accounts/x/ibc-account"
-	// ibcaccountkeeper "github.com/cosmos/interchain-accounts/x/ibc-account/keeper"
-	// ibcaccounttypes "github.com/cosmos/interchain-accounts/x/ibc-account/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
 	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
 
 	appparams "github.com/interchainberlin/pooltoy/app/params"
 	"github.com/interchainberlin/pooltoy/x/faucet"
-	"github.com/interchainberlin/pooltoy/x/pooltoy"
-	pooltoytypes "github.com/interchainberlin/pooltoy/x/pooltoy/types"
-	faucettypes "github.com/interchainberlin/pooltoy/x/faucet/types"
-	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
 	faucetkeeper "github.com/interchainberlin/pooltoy/x/faucet/keeper"
+	faucettypes "github.com/interchainberlin/pooltoy/x/faucet/types"
+	"github.com/interchainberlin/pooltoy/x/pooltoy"
+	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
+	pooltoytypes "github.com/interchainberlin/pooltoy/x/pooltoy/types"
 )
 
 const Name = "pooltoy"
@@ -163,7 +161,7 @@ var (
 )
 
 var (
-	_ CosmosApp               = (*App)(nil)
+	_ simapp.App              = (*App)(nil)
 	_ servertypes.Application = (*App)(nil)
 )
 
@@ -214,12 +212,13 @@ type App struct {
 	ScopedTransferKeeper   capabilitykeeper.ScopedKeeper
 	ScopedIbcAccountKeeper capabilitykeeper.ScopedKeeper
 
-	PooltoyKeeper    pooltoykeeper.Keeper
-	FaucetKeeper     faucetkeeper.Keeper
+	PooltoyKeeper pooltoykeeper.Keeper
+	FaucetKeeper  faucetkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// the module manager
 	mm *module.Manager
+	sm *module.SimulationManager
 }
 
 // New returns a reference to an initialized Gaia.
@@ -329,7 +328,6 @@ func New(
 		app.AccountKeeper, app.BankKeeper, scopedTransferKeeper,
 	)
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
-
 
 	app.PooltoyKeeper = pooltoykeeper.NewKeeper(
 		appCodec,
@@ -445,6 +443,23 @@ func New(
 	app.mm.RegisterInvariants(&app.CrisisKeeper)
 	app.mm.RegisterRoutes(app.Router(), app.QueryRouter(), encodingConfig.Amino)
 	app.mm.RegisterServices(module.NewConfigurator(app.MsgServiceRouter(), app.GRPCQueryRouter()))
+
+	app.sm = module.NewSimulationManager(
+		auth.NewAppModule(appCodec, app.AccountKeeper, authsims.RandomGenesisAccounts),
+		bank.NewAppModule(appCodec, app.BankKeeper, app.AccountKeeper),
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper),
+		gov.NewAppModule(appCodec, app.GovKeeper, app.AccountKeeper, app.BankKeeper),
+		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
+		staking.NewAppModule(appCodec, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
+		distr.NewAppModule(appCodec, app.DistrKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+		slashing.NewAppModule(appCodec, app.SlashingKeeper, app.AccountKeeper, app.BankKeeper, app.StakingKeeper),
+		params.NewAppModule(app.ParamsKeeper),
+		evidence.NewAppModule(app.EvidenceKeeper),
+		ibc.NewAppModule(app.IBCKeeper),
+		transferModule,
+	)
+
+	app.sm.RegisterStoreDecoders()
 
 	// initialize stores
 	app.MountKVStores(keys)
@@ -582,6 +597,11 @@ func (app *App) GetSubspace(moduleName string) paramstypes.Subspace {
 	return subspace
 }
 
+// SimulationManager implements the SimulationApp interface
+func (app *App) SimulationManager() *module.SimulationManager {
+	return app.sm
+}
+
 // RegisterAPIRoutes registers all application module routes with the provided
 // API server.
 func (app *App) RegisterAPIRoutes(apiSvr *api.Server, apiConfig config.APIConfig) {
@@ -636,7 +656,6 @@ func initParamsKeeper(appCodec codec.BinaryMarshaler, legacyAmino *codec.LegacyA
 
 	return paramsKeeper
 }
-
 
 func (*App) OnTxSucceeded(ctx sdk.Context, sourcePort, sourceChannel string, txHash []byte, txBytes []byte) {
 }

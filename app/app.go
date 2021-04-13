@@ -134,10 +134,8 @@ var (
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
 		ibc.AppModuleBasic{},
-		upgrade.AppModuleBasic{},
 		evidence.AppModuleBasic{},
 		transfer.AppModuleBasic{},
-		vesting.AppModuleBasic{},
 		pooltoy.AppModuleBasic{},
 		faucet.AppModule{},
 	// this line is used by starport scaffolding # stargate/app/moduleBasic

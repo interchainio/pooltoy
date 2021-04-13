@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	scmd "github.com/cosmos/cosmos-sdk/server/cmd"
 	"github.com/interchainberlin/pooltoy/app"
-	cmd "github.com/interchainberlin/pooltoy/cmd/pooltoyd"
+	cmd "github.com/interchainberlin/pooltoy/cmd/pooltoy/cmd"
 )
 
 func main() {

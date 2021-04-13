@@ -90,8 +90,7 @@ type AppModule struct {
 func NewAppModule(cdc codec.Marshaler, k keeper.Keeper, bankKeeper bankkeeper.Keeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{},
-		// cdc:            cdc,
-		keeper: k,
+		keeper:         k,
 	}
 }
 

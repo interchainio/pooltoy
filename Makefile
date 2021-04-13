@@ -1,8 +1,5 @@
-PACKAGES=$(shell go list ./... | grep -v '/simulation')
 DOCKER := $(shell which docker)
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
-VERSION := $(shell echo $(shell git describe --tags) | sed 's/^v//')
-COMMIT := $(shell git log -1 --format='%H')
 
 # TODO: Update the ldflags with the app, client & server names
 ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=NewApp \
@@ -13,14 +10,19 @@ ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=NewApp \
 
 BUILD_FLAGS := -ldflags '$(ldflags)'
 
+###############################################################################
+###                     Install & Clean                                     ###
+###############################################################################
+
 all: install
 
 install: go.sum
-		go install $(BUILD_FLAGS) ./cmd/pooltoyd
+	@echo "--> installing pooltoy"
+	@go install $(BUILD_FLAGS) -v -mod=readonly ./cmd/pooltoy 
 
 go.sum: go.mod
-		@echo "--> Ensure dependencies have not been modified"
-		GO111MODULE=on go mod verify
+	@echo "--> Ensure dependencies have not been modified"
+	GO111MODULE=on go mod verify
 
 # Uncomment when you have some tests
 # test:
@@ -31,9 +33,15 @@ lint:
 	@echo "--> Running linter"
 	@golangci-lint run
 	@go mod verify
+
+clean:
+	sh ./scripts/clean.sh
+
 .PHONY: lint
 
-#PROTOBUF
+###############################################################################
+###                                Protobuf                                 ###
+###############################################################################
 
 proto-all: proto-format proto-lint proto-gen
 

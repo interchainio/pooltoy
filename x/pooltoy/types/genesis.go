@@ -10,7 +10,7 @@ var (
 )
 
 // NewGenesisState creates a new GenesisState object
-func NewGenesisState(users []*User) GenesisState {
+func NewGenesisState(users []User) GenesisState {
 	return GenesisState{
 		users,
 	}
@@ -28,13 +28,14 @@ func MakeAdmin() *User {
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
 func DefaultGenesisState() GenesisState {
 	a := MakeAdmin()
-	u := []*User{a}
-	return GenesisState{u}
+	return GenesisState{
+	Users:	[]User{*a},
+	}
 }
 
 // ValidateGenesis validates the pooltoy genesis parameters
 func ValidateGenesis(data GenesisState) error {
-	for _, user := range data.User {
+	for _, user := range data.Users {
 		if user.Creator == "" {
 			return fmt.Errorf("invalid creator: %s", user.Creator)
 		}

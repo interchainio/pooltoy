@@ -509,6 +509,13 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 	if err := tmjson.Unmarshal(req.AppStateBytes, &genesisState); err != nil {
 		panic(err)
 	}
+
+	// https://github.com/cosmos/cosmos-sdk/pull/7998
+	newDnmRegex := `[a-zA-Z][a-zA-Z0-9/]{2,127}|[\x{1F600}-\x{1F64F}]|[\x{1F300}-\x{1F5FF}]|[\x{1F680}-\x{1F6FF}]|[\x{2600}-\x{26FF}]|[\x{2700}-\x{27BF}]|[\x{1F900}-\x{1F944}]|[\x{1F6AA}-\x{1F9FC}]|[\x{1F191}-\x{1F198}]|[\x{1F50B}-\x{1F9EE}]|[\x{2328}\x{FE0F}]|[\x{1FA91}]|[\x{23F3}]|[\x{1FA80}]`
+	sdk.SetCoinDenomRegex(func() string {
+		return newDnmRegex
+	})
+
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)
 }
 

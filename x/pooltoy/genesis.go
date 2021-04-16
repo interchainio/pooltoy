@@ -11,12 +11,13 @@ import (
 // and the keeper's address to pubkey map
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	var oneAdmin = false
-	for _, u := range data.User {
+	for _, u := range data.Users {
 		if u.IsAdmin {
 			oneAdmin = true
 		}
 		k.InsertUser(ctx, *u)
 	}
+
 	if !oneAdmin {
 		a := types.MakeAdmin()
 		k.InsertUser(ctx, *a)

@@ -18,7 +18,7 @@ all: install
 
 install: go.sum
 	@echo "--> installing pooltoy"
-	@go build $(BUILD_FLAGS) -v -mod=readonly ./cmd/pooltoy 
+	@go install $(BUILD_FLAGS) -v -mod=readonly ./cmd/pooltoy 
 
 go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"

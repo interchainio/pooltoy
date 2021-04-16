@@ -20,5 +20,5 @@ message QueryListUsersRequest {
 }
 
 message QueryListUsersResponse {
-    repeated User users = 1 [(gogoproto.nullable) = false];
+    repeated User users = 1;
 }

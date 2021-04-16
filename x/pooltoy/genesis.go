@@ -1,8 +1,6 @@
 package pooltoy
 
 import (
-	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/google/uuid"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
@@ -12,8 +10,6 @@ import (
 // InitGenesis initialize default parameters
 // and the keeper's address to pubkey map
 func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
-
-	fmt.Println(1)
 	var oneAdmin = false
 	for _, u := range data.Users {
 		if u.IsAdmin {
@@ -21,7 +17,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		}
 		k.InsertUser(ctx, u)
 	}
-	fmt.Println(2)
+
 	if !oneAdmin {
 		a := types.MakeAdmin()
 		k.InsertUser(ctx, *a)

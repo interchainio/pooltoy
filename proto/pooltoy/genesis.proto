@@ -9,5 +9,5 @@ option go_package = "github.com/interchainberlin/pooltoy/x/pooltoy/types";
 import "pooltoy/user.proto";
 
 message GenesisState {
-  repeated User users = 1 [(gogoproto.nullable) = false];
+  repeated User users = 1;
 }

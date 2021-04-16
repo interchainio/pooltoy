@@ -15,7 +15,7 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 		if u.IsAdmin {
 			oneAdmin = true
 		}
-		k.InsertUser(ctx, u)
+		k.InsertUser(ctx, *u)
 	}
 
 	if !oneAdmin {
@@ -50,7 +50,7 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 					Name:        "",
 					Email:       "",
 				}
-				users = append(users, n)
+				users = append(users, &n)
 			}
 		}
 	}

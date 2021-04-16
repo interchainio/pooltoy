@@ -10,7 +10,7 @@ var (
 )
 
 // NewGenesisState creates a new GenesisState object
-func NewGenesisState(users []User) GenesisState {
+func NewGenesisState(users []*User) GenesisState {
 	return GenesisState{
 		users,
 	}
@@ -29,7 +29,7 @@ func MakeAdmin() *User {
 func DefaultGenesisState() GenesisState {
 	a := MakeAdmin()
 	return GenesisState{
-	Users:	[]User{*a},
+		Users: []*User{a},
 	}
 }
 

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/interchainberlin/pooltoy/x/faucet/types"
 	"github.com/spf13/cobra"
 )
@@ -20,15 +21,13 @@ func GetQueryCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	pooltoyQueryCmd.AddCommand([]*cobra.Command{
-		queryWhenBrrr(),
-	}...)
+	pooltoyQueryCmd.AddCommand(queryWhenBrrr())
 
 	return pooltoyQueryCmd
 }
 
 func queryWhenBrrr() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "when-brrr [userAccount]",
 		Short: "how many seconds until this user can brrr again",
 		Args:  cobra.ExactArgs(1),
@@ -46,4 +45,6 @@ func queryWhenBrrr() *cobra.Command {
 			return ctx.PrintProto(res)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }

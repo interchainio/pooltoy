@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 	"github.com/spf13/cobra"
 )
@@ -20,22 +21,18 @@ func GetQueryCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	pooltoyQueryCmd.AddCommand([]*cobra.Command{
-		queryListUsers(),
-	}...)
+	pooltoyQueryCmd.AddCommand(queryListUsers())
 
 	return pooltoyQueryCmd
 }
 
 func queryListUsers() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "list-users",
 		Short: "list all users",
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("inside query")
 			ctx, err := client.GetClientTxContext(cmd)
-			fmt.Println("ctx")
 			if err != nil {
 				return err
 			}
@@ -50,4 +47,6 @@ func queryListUsers() *cobra.Command {
 			return ctx.PrintProto(res)
 		},
 	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
 }

@@ -57,7 +57,7 @@ func txMint() *cobra.Command {
 
 // txMint is the CLI command for minting coins to a specified address
 func txMintFor() *cobra.Command {
-	return &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "mintfor [address] [denom]",
 		Short: "mint coin for new address",
 		Args:  cobra.MinimumNArgs(1),
@@ -78,4 +78,6 @@ func txMintFor() *cobra.Command {
 			return tx.GenerateOrBroadcastTxCLI(ctx, cmd.Flags(), msg)
 		},
 	}
+	flags.AddTxFlagsToCmd(cmd)
+	return cmd
 }

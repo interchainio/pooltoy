@@ -36,7 +36,6 @@ func txCreateUser() *cobra.Command {
 		Short: "Creates a new user",
 		Args:  cobra.MinimumNArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("inside tx")
 			ctx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
@@ -44,7 +43,6 @@ func txCreateUser() *cobra.Command {
 
 			// parse arguments from cmd
 			a, err := strconv.ParseBool(args[1])
-			fmt.Println("here is your argument", a)
 			if err != nil {
 				return err
 			}
@@ -61,7 +59,6 @@ func txCreateUser() *cobra.Command {
 			if err = msg.ValidateBasic(); err != nil {
 				return err
 			}
-			fmt.Println("here is your message", msg)
 
 			return tx.GenerateOrBroadcastTxCLI(ctx, cmd.Flags(), msg)
 		},

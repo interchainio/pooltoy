@@ -1,7 +1,6 @@
 package faucet
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -62,7 +61,7 @@ func (AppModuleBasic) GetTxCmd() *cobra.Command {
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the distribution module.
 // also implements app modeul basic
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
-	types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
+	// types.RegisterQueryHandlerClient(context.Background(), mux, types.NewQueryClient(clientCtx))
 }
 
 // RegisterInterfaces implements app module basic

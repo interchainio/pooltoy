@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -32,13 +33,13 @@ func queryWhenBrrr() *cobra.Command {
 		Short: "how many seconds until this user can brrr again",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx, err := client.GetClientQueryContext(cmd)
+			ctx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
 			queryClient := types.NewQueryClient(ctx)
 			req := &types.QueryWhenBrrRequest{}
-			res, err := queryClient.QueryWhenBrr(cmd.Context(), req)
+			res, err := queryClient.QueryWhenBrr(context.Background(), req)
 			if err != nil {
 				return err
 			}

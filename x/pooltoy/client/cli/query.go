@@ -1,6 +1,7 @@
 package cli
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -33,14 +34,15 @@ func queryListUsers() *cobra.Command {
 		Args:  cobra.NoArgs,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			fmt.Println("inside query")
-			ctx, err := client.GetClientQueryContext(cmd)
+			ctx, err := client.GetClientTxContext(cmd)
+			fmt.Println("ctx")
 			if err != nil {
 				return err
 			}
 
 			queryClient := types.NewQueryClient(ctx)
 			req := &types.QueryListUsersRequest{}
-			res, err := queryClient.QueryListUsers(cmd.Context(), req)
+			res, err := queryClient.QueryListUsers(context.Background(), req)
 			if err != nil {
 				return err
 			}

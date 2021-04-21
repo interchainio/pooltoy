@@ -44,7 +44,6 @@ func txCreateUser() *cobra.Command {
 
 			// parse arguments from cmd
 			a, err := strconv.ParseBool(args[1])
-			fmt.Println("here is your argument", a)
 			if err != nil {
 				return err
 			}

@@ -28,7 +28,7 @@ func GetQueryCmd() *cobra.Command {
 
 func queryWhenBrrr() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "when-brrr [userAccount]",
+		Use:   "when-brrr [Address]",
 		Short: "how many seconds until this user can brrr again",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -37,7 +37,9 @@ func queryWhenBrrr() *cobra.Command {
 				return err
 			}
 			queryClient := types.NewQueryClient(ctx)
-			req := &types.QueryWhenBrrRequest{}
+			req := &types.QueryWhenBrrRequest{
+				Address: args[0],
+			}
 			res, err := queryClient.QueryWhenBrr(context.Background(), req)
 			if err != nil {
 				return err

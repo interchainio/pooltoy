@@ -21,8 +21,6 @@ func GetTxCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	pooltoyTxCmd.AddCommand()
-
 	pooltoyTxCmd.AddCommand(
 		txCreateUser(),
 	)

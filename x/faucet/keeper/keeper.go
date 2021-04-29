@@ -86,6 +86,7 @@ func (k Keeper) MintAndSend(ctx sdk.Context, msg *types.MsgMint) error {
 	newCoin := sdk.NewCoin(msg.Denom, sdk.NewInt(k.amount))
 	m.Tally = m.Tally + k.amount
 	m.Lasttime = mintTime
+	k.Logger(ctx).Info("*********** mintHistory *********", m)
 	k.setMintHistory(ctx, a, m)
 	k.Logger(ctx).Info("Mint coin: %s", newCoin)
 	newCoins := sdk.NewCoins(newCoin)
@@ -124,10 +125,12 @@ func (k Keeper) getMintHistory(ctx sdk.Context, minter sdk.AccAddress) types.Min
 
 func (k Keeper) setMintHistory(ctx sdk.Context, minter sdk.AccAddress, history types.MintHistory) {
 	if history.Minter == "" {
+		k.Logger(ctx).Info("history.Minter is empty")
 		return
 	}
 
 	if history.Tally == 0 {
+		k.Logger(ctx).Info("history.Tally is empty")
 		return
 	}
 

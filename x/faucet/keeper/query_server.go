@@ -33,9 +33,7 @@ func (k Keeper) QueryWhenBrr(c context.Context, req *types.QueryWhenBrrRequest) 
 	isPresent := k.isPresent(ctx, ma)
 	var timeLeft int64
 	if !isPresent {
-		return &types.QueryWhenBrrResponse{
-			TimeLeft: 0,
-		}, nil
+		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
 	lastTime := time.Unix(m.Lasttime, 0)

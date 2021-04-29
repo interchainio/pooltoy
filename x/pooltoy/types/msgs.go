@@ -45,5 +45,9 @@ func (msg *MsgCreateUser) GetSignBytes() []byte {
 
 // GetSigners defines whose signature is required
 func (msg *MsgCreateUser) GetSigners() []sdk.AccAddress {
-	return []sdk.AccAddress{sdk.AccAddress(msg.Creator)}
+	sender, err := sdk.AccAddressFromBech32(msg.Creator)
+	if err != nil {
+		panic(err)
+	}
+	return []sdk.AccAddress{sdk.AccAddress(sender)}
 }

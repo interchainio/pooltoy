@@ -1,6 +1,8 @@
 package types
 
 import (
+	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -47,6 +49,7 @@ func (msg *MsgCreateUser) GetSignBytes() []byte {
 func (msg *MsgCreateUser) GetSigners() []sdk.AccAddress {
 	sender, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
+		fmt.Println(err)
 		panic(err)
 	}
 	return []sdk.AccAddress{sdk.AccAddress(sender)}

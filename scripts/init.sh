@@ -13,7 +13,7 @@ pooltoy add-genesis-account $(pooltoy keys show alice -a) 1000token,100000000sta
 pooltoy add-genesis-account $(pooltoy keys show bob -a) 1token
 
 jq -c '.accounts[]' accounts.json | while read i; do
-    pooltoy add-genesis-account $(echo "$i" | jq -r '.value.address') $(echo $i | jq -r '.value.coins | map(.amount) | join(",")')
+    pooltoy add-genesis-account $(echo "$i" | jq -r '.address') $(echo $i | jq -r '.coins | map(.amount+.denom) | join(",")')
 done
 
 pooltoy collect-gentxs

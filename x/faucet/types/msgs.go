@@ -1,7 +1,7 @@
 package types
 
 import (
-	"fmt"
+	fmt "fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -55,7 +55,7 @@ func (msg *MsgMint) GetSigners() []sdk.AccAddress {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		fmt.Println(err)
-		panic(err)
+		// panic(err)
 	}
 	return []sdk.AccAddress{sdk.AccAddress(sender)}
 }

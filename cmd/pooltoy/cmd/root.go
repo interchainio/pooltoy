@@ -60,6 +60,10 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		},
 	}
 
+	sdk.SetCoinDenomRegex(func() string {
+		return app.NewDnmRegex
+	})
+
 	initRootCmd(rootCmd, encodingConfig)
 	return rootCmd, encodingConfig
 }

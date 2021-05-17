@@ -605,10 +605,6 @@
           ]
         },
         {
-          "address": "cosmos1jv65s3grqf6v6jl3dp4t6c9t9rk99cd88lyufl",
-          "coins": []
-        },
-        {
           "address": "cosmos153z2rmmrce3539ng4rtmhsfhwxj4vnmtuhllfa",
           "coins": [
             {
@@ -799,18 +795,6 @@
               "denom": "🧠"
             }
           ]
-        },
-        {
-          "address": "cosmos1e2rxp5xs3hepjpywcsym07yj64v65x4vuw3j3g",
-          "coins": []
-        },
-        {
-          "address": "cosmos17xpfvakm2amg962yls6f84z3kell8c5lserqta",
-          "coins": []
-        },
-        {
-          "address": "cosmos17s95c5jpc6x2l3edwh4dm8yhac68yru7cre47d",
-          "coins": []
         },
         {
           "address": "cosmos1730axaje8j3qd8n00p0wtcz6cx8v0n8pcjx7hw",

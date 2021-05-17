@@ -33,7 +33,10 @@ func (k Keeper) QueryWhenBrr(c context.Context, req *types.QueryWhenBrrRequest) 
 	isPresent := k.isPresent(ctx, ma)
 	var timeLeft int64
 	if !isPresent {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		// has never minted if not present in the keeper
+		return &types.QueryWhenBrrResponse{
+			TimeLeft: 0,
+		}, nil
 	}
 
 	lastTime := time.Unix(m.Lasttime, 0)

@@ -3,7 +3,6 @@ package types
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/google/uuid"
 )
 
 func NewUser(
@@ -13,7 +12,6 @@ func NewUser(
 	email string,
 ) User {
 	return User{
-		Id:          uuid.New().String(),
 		UserAccount: userAccount,
 		IsAdmin:     isAdmin,
 		Name:        name,

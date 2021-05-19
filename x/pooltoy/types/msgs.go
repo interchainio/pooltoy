@@ -32,7 +32,7 @@ func (msg *MsgCreateUser) Type() string { return TypeCreateUser }
 
 // ValidateBasic runs stateless checks on the message
 func (msg *MsgCreateUser) ValidateBasic() error {
-	_, err := sdk.ValAddressFromBech32(msg.Creator)
+	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Creator)
 	}
@@ -48,7 +48,6 @@ func (msg *MsgCreateUser) GetSignBytes() []byte {
 // GetSigners defines whose signature is required
 func (msg *MsgCreateUser) GetSigners() []sdk.AccAddress {
 	sender, err := sdk.AccAddressFromBech32(msg.Creator)
-	fmt.Println(msg.Creator)
 	if err != nil {
 		fmt.Println(err)
 		// panic(err)

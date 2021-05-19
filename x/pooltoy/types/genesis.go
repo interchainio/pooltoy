@@ -27,9 +27,9 @@ func MakeAdmin() *User {
 
 // DefaultGenesisState - default GenesisState used by Cosmos Hub
 func DefaultGenesisState() GenesisState {
-	a := MakeAdmin()
+	// a := MakeAdmin()
 	return GenesisState{
-		Users: []*User{a},
+		// Users: []*User{},
 	}
 }
 

@@ -1,3 +1,3 @@
 #!/bin/bash
-pooltoycli tx pooltoy create-user $(pooltoycli keys show alice -a) true billy U01246QFA2U --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
-pooltoycli tx pooltoy create-user $(pooltoycli keys show bob -a) true sam U011HTNSBSN --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
+pooltoy tx pooltoy create-user $(pooltoy keys show alice -a --keyring-backend test) true alice alice --from alice -y --keyring-backend test --chain-id pooltoy-5 
+# | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx | jq ".raw_log"

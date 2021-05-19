@@ -2,7 +2,6 @@ package pooltoy
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/google/uuid"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
 	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
 )
@@ -19,8 +18,8 @@ func InitGenesis(ctx sdk.Context, k keeper.Keeper, data types.GenesisState) {
 	}
 
 	if !oneAdmin {
-		a := types.MakeAdmin()
-		k.InsertUser(ctx, *a)
+		// a := types.MakeAdmin()
+		// k.InsertUser(ctx, *a)
 	}
 }
 
@@ -46,7 +45,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 				n := types.User{
 					UserAccount: acct.GetAddress().String(),
 					IsAdmin:     false,
-					Id:          uuid.New().String(),
 					Name:        "",
 					Email:       "",
 				}

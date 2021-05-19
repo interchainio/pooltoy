@@ -43,9 +43,7 @@ func (k Keeper) ListAccounts(ctx sdk.Context) []authtypes.AccountI {
 }
 
 func (k Keeper) InsertUser(ctx sdk.Context, user types.User) error {
-	// TODO: use account address as key
-	// then we can remove account address from U
-	key := []byte(types.UserPrefix + user.Id)
+	key := []byte(types.UserPrefix + user.UserAccount)
 
 	u, err := k.cdc.MarshalBinaryBare(&user)
 	if err != nil {

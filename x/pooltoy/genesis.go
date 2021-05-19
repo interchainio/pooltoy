@@ -45,7 +45,6 @@ func ExportGenesis(ctx sdk.Context, k keeper.Keeper) types.GenesisState {
 				n := types.User{
 					UserAccount: acct.GetAddress().String(),
 					IsAdmin:     false,
-					Id:          "",
 					Name:        "",
 					Email:       "",
 				}

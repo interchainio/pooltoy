@@ -1,7 +1,7 @@
 {
   "balances": [
     {
-      "name": "Alice",
+      "name": "alice",
       "address": "cosmos1qd4gsa4mlnpzmv4zsf9ghdrsgkt5avs8zte65u",
       "coins": [
         {

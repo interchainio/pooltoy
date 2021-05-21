@@ -6,7 +6,6 @@ require (
 	github.com/cosmos/cosmos-sdk v0.42.3
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.1
-	github.com/google/uuid v1.2.0
 	github.com/gorilla/mux v1.8.0
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/kr/text v0.2.0 // indirect
@@ -24,6 +23,4 @@ require (
 )
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
-// replace github.com/cosmos/cosmos-sdk => /Users/billy/GitHub/cosmos/cosmos-sdk
-
 replace google.golang.org/grpc => google.golang.org/grpc v1.33.2

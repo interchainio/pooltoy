@@ -19,5 +19,3 @@ jq -c '.balances[]' accounts.json | while read i; do
 done
 
 pooltoy gentx alice 100000000stake --chain-id pooltoy-5 --keyring-backend test
-pooltoy collect-gentxs
-pooltoy validate-genesis

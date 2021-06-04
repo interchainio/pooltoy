@@ -127,7 +127,6 @@ var (
 		transfer.AppModuleBasic{},
 		pooltoy.AppModuleBasic{},
 		faucet.AppModule{},
-	// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions

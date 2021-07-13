@@ -6,9 +6,10 @@ import "gogoproto/gogo.proto";
 
 
 message User {
-  string creator      = 1;
-  string user_account = 2 [(gogoproto.jsontag) = "userAccount"];
-  bool   is_admin     = 3 [(gogoproto.jsontag) = "isAdmin"];
-  string name         = 4;
-  string email        = 5;
+  string id           = 1;
+  string creator      = 2;
+  string user_account = 3 [(gogoproto.jsontag) = "userAccount"];
+  bool   is_admin     = 4 [(gogoproto.jsontag) = "isAdmin"];
+  string name         = 5;
+  string email        = 6;
 }

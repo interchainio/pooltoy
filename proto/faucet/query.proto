@@ -10,7 +10,7 @@ option go_package = "github.com/interchainberlin/pooltoy/x/faucet/types";
 
 // Query defines the gRPC querier service for the faucet module.
 service Query {
-      // WhenBrr queries the last time an address minted 
+      // WhenBrr queries the last time an address minted
     rpc QueryWhenBrr(QueryWhenBrrRequest) returns (QueryWhenBrrResponse) {
         option (google.api.http).get = "/whenBrr/{address}";
     }

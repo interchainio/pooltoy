@@ -183,8 +183,8 @@ type App struct {
 	BankKeeper       bankkeeper.Keeper
 	CapabilityKeeper *capabilitykeeper.Keeper
 	StakingKeeper    stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper
-	MintKeeper       mintkeeper.Keeper
+	SlashingKeeper   slashingkeeper.Keeper  // todo check if needed
+	MintKeeper       mintkeeper.Keeper // todo check if needed
 	DistrKeeper      distrkeeper.Keeper
 	GovKeeper        govkeeper.Keeper
 	CrisisKeeper     crisiskeeper.Keeper

@@ -22,6 +22,7 @@ func GetQueryCmd() *cobra.Command {
 	}
 
 	pooltoyQueryCmd.AddCommand(queryListUsers())
+	pooltoyQueryCmd.AddCommand(queryMostEmojiOwner())
 
 	return pooltoyQueryCmd
 }
@@ -40,6 +41,31 @@ func queryListUsers() *cobra.Command {
 			queryClient := types.NewQueryClient(ctx)
 			req := &types.QueryListUsersRequest{}
 			res, err := queryClient.QueryListUsers(context.Background(), req)
+			if err != nil {
+				return err
+			}
+
+			return ctx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func queryMostEmojiOwner() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "mostemoji",
+		Short: "who has the most emoji",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(ctx)
+			req := &types.QueryMostEmojiOwnerRequest{}
+			res, err := queryClient.QueryMostEmojiOwner(context.Background(), req)
 			if err != nil {
 				return err
 			}

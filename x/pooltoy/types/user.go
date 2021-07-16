@@ -12,6 +12,7 @@ func NewUser(
 	email string,
 ) User {
 	return User{
+		Id:          "",
 		UserAccount: userAccount,
 		IsAdmin:     isAdmin,
 		Name:        name,

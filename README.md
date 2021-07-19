@@ -24,16 +24,17 @@ pooltoy start
 ```
 Now you are ready to explore the emoji blockchain!
 
-Open a new termial window to try the following commands!
+Open a new terminal window to try the following commands!
   
 
 ## Emoji trading
 
 ### Create new users
 
-The account.json file contains a list of user names, addresses, and their initial emoji balances. Those data are the genesis accounts data. The users account info. can be queried as shown in the **query account info** section.
-alice is the admin that can create users on pooltoy chain.
+The account.json file contains a list of user names, addresses, and their initial emoji balances. Those data are the genesis accounts data. The users account info. can be queried as shown in the **query account info** section. 
 
+New users join in pooltoy through ` pooltoy tx pooltoy create-user`. The first-created-user must be an admin user. Any account on the chain can create this first admin user because there was no admin before. From second user creation on, only admin can create users. 
+Therefore, if the first-created-user is not admin, the creating user will break. No more users can be created afterwards.
 
 ```shell
 # add the key to the keyring
@@ -41,20 +42,24 @@ alice is the admin that can create users on pooltoy chain.
  # check the key
  pooltoy keys show [name_or_address]
  # get the address
-  pooltoy keys show [name_or_address] -a
+ pooltoy keys show [name_or_address] -a
+ # create an admin for this key
+ pooltoy tx pooltoy create-user [address] true [name] [email] --from alice -y -b block
  # create a user for this key
  pooltoy tx pooltoy create-user [address] false [name] [email] --from alice -y -b block
  #check auth info
  pooltoy q auth account [address]
+ #list all the keys
+ pooltoy keys list
  # list users
  pooltoy q pooltoy list-users
 ```
 Please note:
 
 - the above `false` in `create-user` command is for creating non-admin, true for creating an admin.
-- A new created user has no emoji balances.
+- a new created user has no emoji balances.
 
-Presently pooltoy is designed to work together with slackbot to mint/send/receive emoji in slack chat, slack controls the user authorization. So when you run pooltoy alone, you have permissions to use all the accounts on the pooltoy chain. You can play the role of admin(Alice) or any other user's role. For example, you can send from any account to another if both accounts exist, and the sender has sufficient funds.
+Presently pooltoy is designed to work together with slackbot to trade emoji in slack chat, slack controls the user authorization. So when you run pooltoy alone, you have permissions to use all the accounts on the pooltoy chain. You can play the role of admin or any other user's role. For example, you can send from any account to another if both accounts exist, and the sender has sufficient funds.
 
 ### queries
 ##### query account info

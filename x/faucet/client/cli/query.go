@@ -21,7 +21,7 @@ func GetQueryCmd() *cobra.Command {
 		RunE:                       client.ValidateCmd,
 	}
 
-	pooltoyQueryCmd.AddCommand(queryWhenBrrr())
+	pooltoyQueryCmd.AddCommand(queryWhenBrrr(), queryEmojiRank())
 
 	return pooltoyQueryCmd
 }
@@ -44,6 +44,31 @@ func queryWhenBrrr() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			return ctx.PrintProto(res)
+		},
+	}
+	flags.AddQueryFlagsToCmd(cmd)
+	return cmd
+}
+
+func queryEmojiRank() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "emoji-rank",
+		Short: "emoji rank",
+		Args:  cobra.NoArgs,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			queryClient := types.NewQueryClient(ctx)
+			req := &types.QueryEmojiRankRequest{}
+			res, err := queryClient.QueryEmojiRank(context.Background(), req)
+			if err != nil {
+				return err
+			}
+
 			return ctx.PrintProto(res)
 		},
 	}

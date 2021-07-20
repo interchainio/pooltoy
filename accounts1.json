@@ -1,0 +1,52 @@
+{
+  "balances": [
+    {
+      "name": "alice",
+      "address": "cosmos1qd4gsa4mlnpzmv4zsf9ghdrsgkt5avs8zte65u",
+      "coins": [
+        {
+          "amount": "1000",
+          "denom": "token"
+        },
+        {
+          "amount": "100000000",
+          "denom": "stake"
+        }
+      ]
+    },
+    {
+      "address": "cosmos1pxjvm30nf0n832sd0u02nsk8d0un0czv67t9f6",
+      "name": "U01JT5U5WK0",
+      "really": "Sean",
+      "coins": [
+        {
+          "amount": "1",
+          "denom": "🍣"
+        },
+        {
+          "amount": "1",
+          "denom": "🎻"
+        },
+        {
+          "amount": "1",
+          "denom": "🛠️"
+        }
+      ]
+    },
+    {
+      "address": "cosmos1zw9p9sppnxawvjqyngn9ce4hy97mu3fjp3tnm9",
+      "name": "U01EQ9RH73P",
+      "really": "Onur",
+      "coins": [
+        {
+          "amount": "1",
+          "denom": "🆗"
+        },
+        {
+          "amount": "2",
+          "denom": "🍍"
+        }
+      ]
+    }
+  ]
+}

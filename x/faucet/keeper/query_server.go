@@ -87,7 +87,7 @@ func (k Keeper) QueryEmojiRank(c context.Context, req *types.QueryEmojiRankReque
 				amount += emoji.Amount.Int64()
 			}
 		}
-
+		
 		ranks = append(ranks, &types.Amount{Address: addr.String(), Total: amount})
 	}
 

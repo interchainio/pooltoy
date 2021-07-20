@@ -23,11 +23,3 @@ message QueryListUsersRequest {
 message QueryListUsersResponse {
   repeated User users = 1;
 }
-
-message QueryMostEmojiOwnerRequest {
-}
-
-message QueryMostEmojiOwnerResponse {
-  string address = 1;
-  int64 total = 2;
-}

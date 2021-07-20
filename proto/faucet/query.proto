@@ -27,6 +27,7 @@ message QueryWhenBrrResponse {
 }
 
 message QueryEmojiRankRequest {
+    int64 showNum = 1;
 }
 
 message QueryEmojiRankResponse {

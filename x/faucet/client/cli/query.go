@@ -3,6 +3,7 @@ package cli
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -53,9 +54,9 @@ func queryWhenBrrr() *cobra.Command {
 
 func queryEmojiRank() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "emoji-rank",
+		Use:   "emoji-rank [show number]",
 		Short: "emoji rank",
-		Args:  cobra.NoArgs,
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -63,7 +64,14 @@ func queryEmojiRank() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(ctx)
-			req := &types.QueryEmojiRankRequest{}
+			num, err := strconv.Atoi(args[0])
+			if err != nil {
+				panic(err)
+			}
+
+			req := &types.QueryEmojiRankRequest{
+				ShowNum: int64(num),
+			}
 			res, err := queryClient.QueryEmojiRank(context.Background(), req)
 			if err != nil {
 				return err

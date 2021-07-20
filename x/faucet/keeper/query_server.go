@@ -2,12 +2,17 @@ package keeper
 
 import (
 	"context"
+<<<<<<< HEAD
 	"sort"
 	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	"github.com/interchainberlin/pooltoy/regex"
+=======
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+>>>>>>> e79cb54 (add feature queryEmojiRank)
 	"github.com/interchainberlin/pooltoy/x/faucet/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -87,7 +92,7 @@ func (k Keeper) QueryEmojiRank(c context.Context, req *types.QueryEmojiRankReque
 				amount += emoji.Amount.Int64()
 			}
 		}
-		
+
 		ranks = append(ranks, &types.Amount{Address: addr.String(), Total: amount})
 	}
 

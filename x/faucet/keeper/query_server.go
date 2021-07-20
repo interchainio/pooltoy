@@ -67,24 +67,24 @@ func (k Keeper) QueryEmojiRank(c context.Context, req *types.QueryEmojiRankReque
 	accounts := k.AccountKeeper.GetAllAccounts(ctx)
 
 	for _, account := range accounts {
-	//	nonEmojiAccount := false
+		nonEmojiAccount := false
 		addr = account.GetAddress()
 
 		balances = k.BankKeeper.GetAllBalances(ctx, addr)
 
 		for _, emoji := range balances {
-			//if emoji.Denom == "stake" || emoji.Denom == "token" {
-			//	nonEmojiAccount = true
-			//	break
-			//}
+			if emoji.Denom == "stake" || emoji.Denom == "token" {
+				nonEmojiAccount = true
+				break
+			}
 
 			amount += emoji.Amount.Int64()
 
 		}
 
-		//if nonEmojiAccount == true {
-		//	continue
-		//}
+		if nonEmojiAccount == true {
+			continue
+		}
 		ranks = append(ranks, &types.Amount{Address: addr.String(), Total: amount})
 
 	}

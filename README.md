@@ -31,9 +31,9 @@ Open a new terminal window to try the following commands!
 
 ### Create new users
 
-The account.json file contains a list of user names, addresses, and their initial emoji balances. Those data are the genesis accounts data. The users account info. can be queried as shown in the **query account info** section. 
+The account.json file contains a list of user names, addresses, and their initial emoji balances. Those data are the genesis accounts data. The user account info. can be queried as shown in the **query account info** section. 
 
-New users join in pooltoy through ` pooltoy tx pooltoy create-user`. The first-created-user must be an admin user. Any account on the chain can create this first admin user because there was no admin before. From second user creation on, only admin can create users. 
+New users join in pooltoy through ` pooltoy tx pooltoy create-user`. The first-created-user must be an admin user. Any account on the chain can create this first admin user because there was no admin before. From the second user creation on, only the admin can create users. 
 Therefore, if the first-created-user is not admin, the creating user will break. No more users can be created afterwards.
 
 ```shell

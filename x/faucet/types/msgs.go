@@ -2,10 +2,9 @@ package types
 
 import (
 	fmt "fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	emoji "github.com/tmdvs/Go-Emoji-Utils"
+	"github.com/interchainberlin/pooltoy/x/faucet/utils"
 )
 
 var (
@@ -37,9 +36,10 @@ func (msg *MsgMint) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Minter)
 	}
-	results := emoji.FindAll(msg.Denom)
-	if len(results) != 1 {
-		return ErrNoEmoji
+
+	_, err = utils.ParseEmoji(msg.Denom)
+	if err != nil {
+		return utils.ErrParseEmoji
 	}
 
 	return nil

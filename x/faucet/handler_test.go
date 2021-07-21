@@ -2,6 +2,7 @@ package faucet
 
 import (
 	"fmt"
+	"github.com/interchainberlin/pooltoy/x/faucet/utils"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"

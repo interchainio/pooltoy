@@ -57,6 +57,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 func (k Keeper) MintAndSend(ctx sdk.Context, msg *types.MsgMint) error {
 	// TODO: should most of this logic be in the msg_server?
 
+
 	mintTime := ctx.BlockTime().Unix()
 	if msg.Denom == k.StakingKeeper.BondDenom(ctx) {
 		return types.ErrCantWithdrawStake

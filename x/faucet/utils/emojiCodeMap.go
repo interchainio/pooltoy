@@ -5,7 +5,7 @@ package utils
 // DO NOT EDIT
 
 // Mapping from character to concrete escape code.
-var emojiCodeMap = map[string]string{
+var EmojiCodeMap = map[string]string{
 	":+1:":                                 "\U0001f44d",
 	":-1:":                                 "\U0001f44e",
 	":100:":                                "\U0001f4af",

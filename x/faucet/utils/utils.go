@@ -2,7 +2,7 @@ package utils
 
 // parse emoji for mintfor, only allows format like "\U0001f630" or "1\U0001f630"
 func ParseEmoji(emoji string) (string, error) {
-	emojiMap := ReverseMapKV(emojiCodeMap)
+	emojiMap := ReverseMapKV(EmojiCodeMap)
 	_, found1 := emojiMap[emoji]
 	_, found2 := emojiMap[emoji[1:]]
 

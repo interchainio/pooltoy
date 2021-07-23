@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/interchainberlin/pooltoy/x/escrow"
 	"io"
 	"os"
 	"path/filepath"
@@ -74,9 +75,12 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	appparams "github.com/interchainberlin/pooltoy/app/params"
 	"github.com/interchainberlin/pooltoy/regex"
+	escrowkeeper "github.com/interchainberlin/pooltoy/x/escrow/keeper"
+	escrowtypes "github.com/interchainberlin/pooltoy/x/escrow/types"
 	"github.com/interchainberlin/pooltoy/x/faucet"
 	faucetkeeper "github.com/interchainberlin/pooltoy/x/faucet/keeper"
 	faucettypes "github.com/interchainberlin/pooltoy/x/faucet/types"
+
 	"github.com/interchainberlin/pooltoy/x/pooltoy"
 	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
 	pooltoytypes "github.com/interchainberlin/pooltoy/x/pooltoy/types"
@@ -138,6 +142,7 @@ var (
 		transfer.AppModuleBasic{},
 		pooltoy.AppModuleBasic{},
 		faucet.AppModule{},
+		escrow.AppModule{},
 	)
 
 	// module account permissions
@@ -150,6 +155,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		faucettypes.ModuleName:         {authtypes.Minter},
+		escrowtypes.ModuleName:  {authtypes.Staking},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -213,11 +219,13 @@ type App struct {
 	PooltoyKeeper pooltoykeeper.Keeper
 	FaucetKeeper  faucetkeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
-
+	EscrowKeeper escrowkeeper.Keeper
 	// the module manager
 	mm *module.Manager
 	sm *module.SimulationManager
 }
+
+//todo check paramskeeper
 
 // New returns a reference to an initialized Gaia.
 // NewSimApp returns a reference to an initialized SimApp.
@@ -244,6 +252,7 @@ func New(
 		evidencetypes.StoreKey, ibctransfertypes.StoreKey, capabilitytypes.StoreKey,
 		pooltoytypes.StoreKey,
 		faucettypes.StoreKey,
+		escrowtypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -329,7 +338,7 @@ func New(
 	transferModule := transfer.NewAppModule(app.TransferKeeper)
 
 	app.PooltoyKeeper = pooltoykeeper.NewKeeper(
-		appCodec,
+		appCodec,  // todo why this is not app.appCodec
 		keys[pooltoytypes.StoreKey],
 		app.AccountKeeper,
 	)
@@ -343,6 +352,14 @@ func New(
 		keys[faucettypes.StoreKey],
 		app.appCodec,
 	)
+
+	app.EscrowKeeper = escrowkeeper.NewKeeper(
+		app.BankKeeper,
+		app.AccountKeeper,
+		appCodec,  //todo appcodec or app.appcodec?
+		keys[escrowtypes.StoreKey],
+		escrowtypes.StartIndex,
+		)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := porttypes.NewRouter()
@@ -399,6 +416,12 @@ func New(
 		faucet.NewAppModule(
 			app.FaucetKeeper,
 		),
+
+		escrow.NewAppModule(
+			app.appCodec,  //todo 1
+			app.EscrowKeeper,
+			),
+
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -412,7 +435,7 @@ func New(
 		evidencetypes.ModuleName, stakingtypes.ModuleName, minttypes.ModuleName, ibchost.ModuleName,
 	)
 
-	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, pooltoytypes.ModuleName, faucettypes.ModuleName)
+	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, pooltoytypes.ModuleName, faucettypes.ModuleName, escrowtypes.ModuleName)
 
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
@@ -435,6 +458,7 @@ func New(
 		minttypes.ModuleName,
 		pooltoytypes.ModuleName,
 		faucettypes.ModuleName,
+		escrowtypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 

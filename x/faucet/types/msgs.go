@@ -2,9 +2,9 @@ package types
 
 import (
 	fmt "fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/interchainberlin/pooltoy/x/faucet/utils"
 )
 
 var (
@@ -37,9 +37,9 @@ func (msg *MsgMint) ValidateBasic() error {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Minter)
 	}
 
-	_, err = utils.ParseEmoji(msg.Denom)
+	_, err = sdk.ParseCoinsNormalized("1" + msg.Denom)
 	if err != nil {
-		return utils.ErrParseEmoji
+		return err
 	}
 
 	return nil

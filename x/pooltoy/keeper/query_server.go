@@ -27,9 +27,3 @@ func (k Keeper) QueryListUsers(c context.Context, req *types.QueryListUsersReque
 		Users: users,
 	}, nil
 }
-
-//todo change find addr by IterateAccounts in auth
-//https://github1s.com/cosmos /cosmos-sdk/blob/HEAD/x/auth/keeper/keeper.go#L35
-
-// todo move query most emoji to faucet module
-// todo return a emoji rank list

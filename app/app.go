@@ -71,6 +71,7 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	appparams "github.com/interchainberlin/pooltoy/app/params"
+	"github.com/interchainberlin/pooltoy/regex"
 	"github.com/interchainberlin/pooltoy/x/faucet"
 	faucetkeeper "github.com/interchainberlin/pooltoy/x/faucet/keeper"
 	faucettypes "github.com/interchainberlin/pooltoy/x/faucet/types"
@@ -183,8 +184,8 @@ type App struct {
 	BankKeeper       bankkeeper.Keeper
 	CapabilityKeeper *capabilitykeeper.Keeper
 	StakingKeeper    stakingkeeper.Keeper
-	SlashingKeeper   slashingkeeper.Keeper  // todo check if needed
-	MintKeeper       mintkeeper.Keeper // todo check if needed
+	SlashingKeeper   slashingkeeper.Keeper
+	MintKeeper       mintkeeper.Keeper
 	DistrKeeper      distrkeeper.Keeper
 	GovKeeper        govkeeper.Keeper
 	CrisisKeeper     crisiskeeper.Keeper
@@ -377,7 +378,6 @@ func New(
 		pooltoy.NewAppModule(
 			appCodec,
 			app.PooltoyKeeper,
-			app.BankKeeper,
 		),
 
 		faucet.NewAppModule(
@@ -501,7 +501,7 @@ func (app *App) InitChainer(ctx sdk.Context, req abci.RequestInitChain) abci.Res
 	}
 
 	sdk.SetCoinDenomRegex(func() string {
-		return NewDnmRegex
+		return regex.NewDnmRegex
 	})
 
 	return app.mm.InitGenesis(ctx, app.appCodec, genesisState)

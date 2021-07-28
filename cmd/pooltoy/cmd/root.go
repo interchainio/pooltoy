@@ -29,6 +29,7 @@ import (
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	"github.com/interchainberlin/pooltoy/app"
 	"github.com/interchainberlin/pooltoy/app/params"
+	"github.com/interchainberlin/pooltoy/regex"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	tmcli "github.com/tendermint/tendermint/libs/cli"
@@ -70,7 +71,7 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	}
 
 	sdk.SetCoinDenomRegex(func() string {
-		return app.NewDnmRegex
+		return regex.NewDnmRegex
 	})
 
 	initRootCmd(rootCmd, encodingConfig)

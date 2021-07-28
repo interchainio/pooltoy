@@ -6,6 +6,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/interchainberlin/pooltoy/x/escrow/types"
+	"github.com/interchainberlin/pooltoy/x/escrow/utils"
 )
 
 type msgServer struct {
@@ -27,11 +28,37 @@ func (k Keeper) Offer(c context.Context, msg *types.OfferRequest) (*types.OfferR
 		return nil, sdkerrors.Wrap(err, fmt.Sprintf("unable to offer"))
 	}
 
+
+	_, err = k.InsertOffer(ctx, *msg)
+	if err != nil {
+		return nil, err
+	}
+
 	return res, nil
 }
 
-//func (k Keeper) getIndex(ctx sdk.Context) int64{
-//	//store := ctx.KVStore(k.storeKey)
-//	//if k.isPresent(ctx, )
-//	return 1
-//}
+func (k Keeper) OfferSend(ctx sdk.Context, msg *types.OfferRequest) (*types.OfferResponse, error) {
+
+	addr, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		fmt.Println("addr err!!!!")
+		return &types.OfferResponse{}, err
+	}
+	amount, err := utils.ParseCoins(msg.Amount)
+	if err != nil {
+		return &types.OfferResponse{}, err
+	}
+
+	//	moduleAcc:= k.AccountKeeper.GetModuleAddress(types.ModuleName)
+
+	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, addr,types.ModuleName, amount)
+	if err != nil {
+		fmt.Println("sending err!!!!")
+		return &types.OfferResponse{}, err
+	}
+
+	presentIdx := k.index
+	*k.index +=1   // some checks this index is not re
+	return &types.OfferResponse{Sender: msg.Sender, Index: *presentIdx}, nil
+}
+

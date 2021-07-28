@@ -18,10 +18,10 @@ func ParseEmoji(emoji string) (string, error) {
 }
 
 
-func ReverseMapKV(emojiMap map[string]string)map[string]string{
-	reversedMap := map[string]string{}
-	for k, v := range emojiMap{
-		reversedMap[v] = k
+func ReverseMapKV(emojiMap map[string]string)map[string]bool{
+	reversedMap := map[string]bool{}
+	for _, v := range emojiMap{
+		reversedMap[v] = true
 	}
 
 	return reversedMap

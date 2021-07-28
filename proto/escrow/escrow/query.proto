@@ -9,7 +9,37 @@ option go_package = "github.com/interchainberlin/pooltoy/x/escrow/types";
 
 // Query defines the gRPC querier service.
 service Query {
-    // this line is used by starport scaffolding # 2
+  // this line is used by starport scaffolding # 2
+  rpc QueryOfferListAll (OfferListAllRequest) returns (OfferListResponse);
+  rpc QueryOfferByID (QueryOfferByIDRequest) returns (Offer);
+  rpc QueryOfferByAddr (QueryOfferByAddrRequest) returns (OfferListResponse);
+
+
 }
 
-// this line is used by starport scaffolding # 3
+message OfferListAllRequest {}
+
+message QueryOfferByIDRequest{
+  string querier = 1;
+  int64 id = 2;
+}
+
+message QueryOfferByAddrRequest {
+  string querier = 1;
+  string offerer = 2;
+}
+
+message Offer {
+  string sender = 1;
+  string amount = 2;
+  //  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  string request = 3;
+  //  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+}
+
+message OfferListResponse {
+  repeated Offer offerList = 1;
+}
+
+
+

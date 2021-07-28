@@ -358,7 +358,7 @@ func New(
 		app.AccountKeeper,
 		appCodec,  //todo appcodec or app.appcodec?
 		keys[escrowtypes.StoreKey],
-		escrowtypes.StartIndex,
+		&escrowtypes.StartIndex,
 		)
 
 	// Create static IBC router, add transfer route, then set and seal it

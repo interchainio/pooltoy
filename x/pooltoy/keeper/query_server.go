@@ -33,3 +33,5 @@ func (k Keeper) QueryListUsers(c context.Context, req *types.QueryListUsersReque
 
 // todo move query most emoji to faucet module
 // todo return a emoji rank list
+
+

@@ -18,15 +18,16 @@ service Msg {
 message OfferRequest {
   string sender = 1;
   string amount = 2;
-//  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  //  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coins"];
   string request = 3;
-//  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  //  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coins"];
 }
 
 //message Coin {
 //  string coin = 1
 //  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin"];
 //}
-  message  OfferResponse {
-  int64 index =1;
-  }
+message  OfferResponse {
+  string sender = 1;
+  int64 index = 2;
+}

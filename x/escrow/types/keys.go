@@ -17,10 +17,14 @@ const (
 	//MemStoreKey = "mem_escrow"
 
 	// this line is used by starport scaffolding # ibc/keys/name
-	StartIndex = int64(0)
+
+
+	OfferPrefix ="offer-"
 )
 
 // this line is used by starport scaffolding # ibc/keys/port
+
+var StartIndex = int64(0)
 
 func KeyPrefix(p string) []byte {
 	return []byte(p)

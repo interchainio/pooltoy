@@ -9,7 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
-
 type AccountExistsCheckDecorator struct {
 	ak         authkeeper.AccountKeeper
 	bankKeeper types.BankKeeper

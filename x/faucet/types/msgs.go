@@ -5,7 +5,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	emoji "github.com/tmdvs/Go-Emoji-Utils"
 )
 
 var (
@@ -37,9 +36,10 @@ func (msg *MsgMint) ValidateBasic() error {
 	if err != nil {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Minter)
 	}
-	results := emoji.FindAll(msg.Denom)
-	if len(results) != 1 {
-		return ErrNoEmoji
+
+	_, err = sdk.ParseCoinsNormalized("1" + msg.Denom)
+	if err != nil {
+		return err
 	}
 
 	return nil

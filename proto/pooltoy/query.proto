@@ -11,14 +11,14 @@ import "pooltoy/user.proto";
 
 // Query defines the gRPC querier service for the pooltoy module.
 service Query {
-    rpc QueryListUsers(QueryListUsersRequest) returns (QueryListUsersResponse) {
-        option (google.api.http).get = "/pooltoy/user";
-    }
+  rpc QueryListUsers(QueryListUsersRequest) returns (QueryListUsersResponse) {
+    option (google.api.http).get = "/pooltoy/user";
+  }
 }
 
 message QueryListUsersRequest {
 }
 
 message QueryListUsersResponse {
-    repeated User users = 1;
+  repeated User users = 1;
 }

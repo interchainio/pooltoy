@@ -12,7 +12,6 @@ import (
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
 	"github.com/interchainberlin/pooltoy/x/faucet/types"
 	"github.com/tendermint/tendermint/libs/log"
-	emoji "github.com/tmdvs/Go-Emoji-Utils"
 )
 
 const FaucetStoreKey = "DefaultFaucetStoreKey"
@@ -56,17 +55,7 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // MintAndSend mint coins and send to receiver.
 func (k Keeper) MintAndSend(ctx sdk.Context, msg *types.MsgMint) error {
 	// TODO: should most of this logic be in the msg_server?
-	results := emoji.FindAll(msg.Denom)
-	if len(results) != 1 {
-		return types.ErrNoEmoji
-	}
 
-	emo, ok := results[0].Match.(emoji.Emoji)
-	if !ok {
-		return types.ErrNoEmoji
-	}
-
-	msg.Denom = emo.Value
 	mintTime := ctx.BlockTime().Unix()
 	if msg.Denom == k.StakingKeeper.BondDenom(ctx) {
 		return types.ErrCantWithdrawStake
@@ -100,6 +89,7 @@ func (k Keeper) MintAndSend(ctx sdk.Context, msg *types.MsgMint) error {
 	}
 
 	receiverAccount := k.AccountKeeper.GetAccount(ctx, r)
+
 	if receiverAccount == nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrUnauthorized, "%s does not exist and is not allowed to receive tokens", msg.Minter)
 	}

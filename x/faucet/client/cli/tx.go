@@ -69,8 +69,11 @@ func txMintFor() *cobra.Command {
 
 			minter, _ := sdk.AccAddressFromBech32(args[0])
 			sender := ctx.GetFromAddress()
-			denom := args[1]
-			msg := types.NewMsgMint(sender, minter, denom)
+			_, err = sdk.ParseCoinsNormalized("1" + args[1])
+			if err != nil {
+				return err
+			}
+			msg := types.NewMsgMint(sender, minter, args[1])
 			if err = msg.ValidateBasic(); err != nil {
 				return fmt.Errorf("message validation failed: %w", err)
 			}

@@ -42,6 +42,7 @@ func escrowOffer() *cobra.Command {
 			if err != nil {
 				return err
 			}
+
 			offer := types.NewOfferRequest(addr, args[1], args[2])
 
 			return tx.GenerateOrBroadcastTxCLI(ctx, cmd.Flags(), offer)

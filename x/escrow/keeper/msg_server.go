@@ -6,7 +6,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/interchainberlin/pooltoy/x/escrow/types"
-	"github.com/interchainberlin/pooltoy/x/escrow/utils"
 )
 
 type msgServer struct {
@@ -21,7 +20,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = Keeper{}
 
-func (k Keeper) Offer(c context.Context, msg *types.OfferRequest) (*types.OfferResponse, error) {
+func (k Keeper) Offer(c context.Context, msg *types.Offer) (*types.OfferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	res, err := k.OfferSend(ctx, msg)
 	if err != nil {
@@ -37,21 +36,21 @@ func (k Keeper) Offer(c context.Context, msg *types.OfferRequest) (*types.OfferR
 	return res, nil
 }
 
-func (k Keeper) OfferSend(ctx sdk.Context, msg *types.OfferRequest) (*types.OfferResponse, error) {
+func (k Keeper) OfferSend(ctx sdk.Context, msg *types.Offer) (*types.OfferResponse, error) {
 
 	addr, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		fmt.Println("addr err!!!!")
 		return &types.OfferResponse{}, err
 	}
-	amount, err := utils.ParseCoins(msg.Amount)
-	if err != nil {
-		return &types.OfferResponse{}, err
-	}
+//	coins, err := sdk.ParseCoinsNormalized(msg.Amount)
+//	if err != nil {
+//		return &types.OfferResponse{}, err
+//	}
 
 	//	moduleAcc:= k.AccountKeeper.GetModuleAddress(types.ModuleName)
 
-	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, addr,types.ModuleName, amount)
+	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, addr,types.ModuleName,msg.Amount)
 	if err != nil {
 		fmt.Println("sending err!!!!")
 		return &types.OfferResponse{}, err

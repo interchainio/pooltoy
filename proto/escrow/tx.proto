@@ -1,0 +1,42 @@
+syntax = "proto3";
+package escrow;
+
+import "gogoproto/gogo.proto";
+import "cosmos/base/v1beta1/coin.proto";
+// this line is used by starport scaffolding # proto/tx/import
+//import "github.com/cosmos/cosmos-sdk/bank/v1beta1/bank.proto";
+
+option go_package = "github.com/interchainberlin/pooltoy/x/escrow/types";
+
+// Msg defines the Msg service.
+service Msg {
+  // this line is used by starport scaffolding # proto/tx/rpc
+  rpc Offer(Offer) returns (OfferResponse);
+  //rpc CancelOffer(CancelOfferRequest) returns(CancelOfferResponse);
+}
+
+// this line is used by starport scaffolding # proto/tx/message
+message Offer {
+  string sender = 1;
+  repeated cosmos.base.v1beta1.Coin amount = 2
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  repeated cosmos.base.v1beta1.Coin request = 3
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+}
+
+//message Coin {
+//  string coin = 1
+//  [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Coin"];
+//}
+message  OfferResponse {
+  string sender = 1;
+  int64 index = 2;
+}
+
+//
+//message CancelOfferRequest {
+//  string sender = 1;
+//  int64 ID = 2;
+//}
+//
+//message CancelOfferResponse{}

@@ -9,7 +9,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
-// todo why this decorator has the same keeper as the keeper?
 type AccountExistsCheckDecorator struct {
 	ak         authkeeper.AccountKeeper
 	bankKeeper types.BankKeeper

@@ -33,7 +33,7 @@ type Offer struct {
 	Amount  github_com_cosmos_cosmos_sdk_types.Coins 
 	// Offer.Amount is the list of emojis Offer.Sender offers at escrow.
 	Request github_com_cosmos_cosmos_sdk_types.Coins 
-	// Offer.Request is the list of emojis Offer.Sender plan to use Offer.Amount to exchange for.
+	// Offer.Request is the list of emojis Offer.Sender plans to use Offer.Amount to exchange for.
 }
 ```
 The sender has to make sure that he has enough balance to provide `Offer.Amount`.

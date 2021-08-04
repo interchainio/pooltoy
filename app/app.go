@@ -1,6 +1,10 @@
 package app
 
 import (
+	store "github.com/cosmos/cosmos-sdk/store/types"
+	"github.com/cosmos/cosmos-sdk/x/upgrade"
+	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	"github.com/interchainberlin/pooltoy/x/escrow"
 	"io"
 	"os"
@@ -51,7 +55,7 @@ import (
 	govclient "github.com/cosmos/cosmos-sdk/x/gov/client"
 	govkeeper "github.com/cosmos/cosmos-sdk/x/gov/keeper"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	transfer "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer"
+	"github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer"
 	ibctransferkeeper "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/keeper"
 	ibctransfertypes "github.com/cosmos/cosmos-sdk/x/ibc/applications/transfer/types"
 	ibc "github.com/cosmos/cosmos-sdk/x/ibc/core"
@@ -96,6 +100,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+
 )
 
 const Name = "pooltoy"
@@ -112,6 +117,8 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.ProposalHandler,
 		upgradeclient.CancelProposalHandler,
 		// this line is used by starport scaffolding # stargate/app/govProposalHandler
+		upgradeclient.ProposalHandler,
+		upgradeclient.CancelProposalHandler,
 	)
 
 	return govProposalHandlers
@@ -133,6 +140,7 @@ var (
 		mint.AppModuleBasic{},
 		distr.AppModuleBasic{},
 		gov.NewAppModuleBasic(getGovProposalHandlers()...),
+		upgrade.AppModuleBasic{},
 		params.AppModuleBasic{},
 		crisis.AppModuleBasic{},
 		slashing.AppModuleBasic{},
@@ -155,7 +163,7 @@ var (
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
 		faucettypes.ModuleName:         {authtypes.Minter},
-		escrowtypes.ModuleName:  {authtypes.Staking},
+		escrowtypes.ModuleName:         {authtypes.Staking},
 	}
 
 	// module accounts that are allowed to receive tokens
@@ -204,6 +212,7 @@ type App struct {
 	MintKeeper       mintkeeper.Keeper // todo check if needed
 	DistrKeeper      distrkeeper.Keeper
 	GovKeeper        govkeeper.Keeper
+	UpgradeKeeper    upgradekeeper.Keeper
 	CrisisKeeper     crisiskeeper.Keeper
 	UpgradeKeeper    upgradekeeper.Keeper
 	ParamsKeeper     paramskeeper.Keeper
@@ -253,6 +262,8 @@ func New(
 		pooltoytypes.StoreKey,
 		faucettypes.StoreKey,
 		escrowtypes.StoreKey,
+		upgradetypes.StoreKey,
+
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -280,7 +291,10 @@ func New(
 	// grant capabilities for the ibc and ibc-transfer modules
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
-
+	//StakingKeeper := stakingkeeper.NewKeeper(
+	//	appCodec, keys[stakingtypes.StoreKey], app.AccountKeeper, app.BankKeeper, app.GetSubspace(stakingtypes.ModuleName),
+	//)
+	app.UpgradeKeeper = upgradekeeper.NewKeeper(skipUpgradeHeights, keys[upgradetypes.StoreKey], appCodec, homePath)
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
 		appCodec, keys[authtypes.StoreKey], app.GetSubspace(authtypes.ModuleName), authtypes.ProtoBaseAccount, maccPerms,
@@ -325,9 +339,14 @@ func New(
 	govRouter := govtypes.NewRouter()
 	govRouter.AddRoute(govtypes.RouterKey, govtypes.ProposalHandler).
 		AddRoute(paramproposal.RouterKey, params.NewParamChangeProposalHandler(app.ParamsKeeper)).
+		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(distrtypes.RouterKey, distr.NewCommunityPoolSpendProposalHandler(app.DistrKeeper)).
 		AddRoute(upgradetypes.RouterKey, upgrade.NewSoftwareUpgradeProposalHandler(app.UpgradeKeeper)).
 		AddRoute(ibchost.RouterKey, ibcclient.NewClientUpdateProposalHandler(app.IBCKeeper.ClientKeeper))
+	app.GovKeeper = govkeeper.NewKeeper(
+		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
+		&stakingKeeper, govRouter,
+	)
 
 	// Create Transfer Keepers
 	app.TransferKeeper = ibctransferkeeper.NewKeeper(
@@ -353,6 +372,7 @@ func New(
 		app.appCodec,
 	)
 
+
 	app.EscrowKeeper = escrowkeeper.NewKeeper(
 		app.BankKeeper,
 		app.AccountKeeper,
@@ -375,10 +395,10 @@ func New(
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
-	app.GovKeeper = govkeeper.NewKeeper(
-		appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
-		&stakingKeeper, govRouter,
-	)
+	//app.GovKeeper = govkeeper.NewKeeper(
+	//	appCodec, keys[govtypes.StoreKey], app.GetSubspace(govtypes.ModuleName), app.AccountKeeper, app.BankKeeper,
+	//	&stakingKeeper, govRouter,
+	//)
 
 	/****  Module Options ****/
 
@@ -432,11 +452,33 @@ func New(
 	app.mm.SetOrderBeginBlockers(
 		upgradetypes.ModuleName,
 		distrtypes.ModuleName, slashingtypes.ModuleName,
-		evidencetypes.ModuleName, stakingtypes.ModuleName, minttypes.ModuleName, ibchost.ModuleName,
+		evidencetypes.ModuleName, stakingtypes.ModuleName, minttypes.ModuleName,pooltoytypes.ModuleName, faucettypes.ModuleName, escrowtypes.ModuleName, ibchost.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(crisistypes.ModuleName, govtypes.ModuleName, stakingtypes.ModuleName, pooltoytypes.ModuleName, faucettypes.ModuleName, escrowtypes.ModuleName)
+	app.UpgradeKeeper.SetUpgradeHandler("pooltoy-upgrade-0",
+		func(ctx sdk.Context, plan upgradetypes.Plan) {
+			// a place to run genesis initialization logic for new modules that were just added as part of the upgrade...
 
+			// var genState escrowtypes.GenesisState
+			//  genState.Params = escrowtypes.DefaultParams()
+			// genState.Params.PoolCreationFee = sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(40000000)))
+			// app.Escrow.InitGenesis(ctx, genState)
+		})
+
+	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
+	if err != nil {
+		panic(err)
+	}
+
+	if upgradeInfo.Name == "pooltoy-upgrade-0" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
+		storeUpgrades := store.StoreUpgrades{
+			// Added: []string{liquiditytypes.ModuleName},
+		}
+
+		// configure store loader that checks if version == upgradeHeight and applies store upgrades
+		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, &storeUpgrades))
+	}
 	// NOTE: The genutils module must occur after staking so that pools are
 	// properly initialized with tokens from genesis accounts.
 	// NOTE: Capability module must occur first so that it can initialize any capabilities

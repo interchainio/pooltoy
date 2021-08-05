@@ -18,9 +18,7 @@ type Keeper struct {
 	AccountKeeper keeper.AccountKeeper
 	cdc        codec.Marshaler
 	storeKey   sdk.StoreKey
-//	memKey     sdk.StoreKey
-	// this line is used by starport scaffolding # ibc/keeper/attribute
-	index *int64
+	idStoreKey sdk.StoreKey
 }
 
 func NewKeeper(
@@ -28,8 +26,7 @@ func NewKeeper(
 	accountKeeper keeper.AccountKeeper,
 	cdc codec.Marshaler,
 	storeKey sdk.StoreKey,
-	//memKey sdk.StoreKey,
-	index *int64,
+	idStoreKey sdk.StoreKey,
 // this line is used by starport scaffolding # ibc/keeper/parameter
 ) Keeper {
 	return Keeper{
@@ -37,7 +34,7 @@ func NewKeeper(
 		AccountKeeper: accountKeeper,
 		cdc:      cdc,
 		storeKey: storeKey,
-		index:    index,
+		idStoreKey: idStoreKey,
 		// this line is used by starport scaffolding # ibc/keeper/return
 	}
 }

@@ -20,13 +20,13 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = Keeper{}
 
+// todo: merge OfferSend and Offer into 1
 func (k Keeper) Offer(c context.Context, msg *types.Offer) (*types.OfferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	res, err := k.OfferSend(ctx, msg)
 	if err != nil {
 		return nil, sdkerrors.Wrap(err, fmt.Sprintf("unable to offer"))
 	}
-
 
 	_, err = k.InsertOffer(ctx, *msg)
 	if err != nil {
@@ -40,7 +40,6 @@ func (k Keeper) OfferSend(ctx sdk.Context, msg *types.Offer) (*types.OfferRespon
 
 	addr, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
-		fmt.Println("addr err!!!!")
 		return &types.OfferResponse{}, err
 	}
 //	coins, err := sdk.ParseCoinsNormalized(msg.Amount)
@@ -52,12 +51,11 @@ func (k Keeper) OfferSend(ctx sdk.Context, msg *types.Offer) (*types.OfferRespon
 
 	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, addr,types.ModuleName,msg.Amount)
 	if err != nil {
-		fmt.Println("sending err!!!!")
 		return &types.OfferResponse{}, err
 	}
 
-	presentIdx := k.index
-	*k.index +=1   // some checks this index is not re
-	return &types.OfferResponse{Sender: msg.Sender, Index: *presentIdx}, nil
+
+	//*k.index +=1   // some checks this index is not in store
+	return &types.OfferResponse{Sender: msg.Sender, Index: k.GetLatestID(ctx)}, nil
 }
 

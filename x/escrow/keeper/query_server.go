@@ -33,6 +33,12 @@ func (k Keeper)QueryOfferByAddr(c context.Context, req *types.QueryOfferByAddrRe
 	return &offers, nil
 }
 
-func (k Keeper) QueryOfferByID(c context.Context, req *types.QueryOfferByIDRequest) (*types.OfferListResponse, error){
-	return nil, nil
+func (k Keeper) QueryOfferByID(c context.Context, req *types.QueryOfferByIDRequest) (*types.Offer, error){
+	ctx := sdk.UnwrapSDKContext(c)
+	offer, err :=k.ListOfferByID(ctx, *req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &offer, nil
 }

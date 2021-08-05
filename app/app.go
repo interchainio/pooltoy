@@ -262,6 +262,7 @@ func New(
 		pooltoytypes.StoreKey,
 		faucettypes.StoreKey,
 		escrowtypes.StoreKey,
+		escrowtypes.IDStoreKey,
 		upgradetypes.StoreKey,
 
 		// this line is used by starport scaffolding # stargate/app/storeKey
@@ -378,7 +379,7 @@ func New(
 		app.AccountKeeper,
 		appCodec,  //todo appcodec or app.appcodec?
 		keys[escrowtypes.StoreKey],
-		&escrowtypes.StartIndex,
+		keys[escrowtypes.IDStoreKey],
 		)
 
 	// Create static IBC router, add transfer route, then set and seal it

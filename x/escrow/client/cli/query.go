@@ -60,7 +60,7 @@ func escrowOfferByAddr() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "offer-by-addr [querier] [offerer]",
 		Short: "show all the offers of an address",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -68,7 +68,7 @@ func escrowOfferByAddr() *cobra.Command {
 			}
 
 			queryClient := types.NewQueryClient(ctx)
-			offerList, err := queryClient.QueryOfferByAddr(context.Background(), &types.QueryOfferByAddrRequest{Querier:args[0], Offerer: args[1]})
+			offerList, err := queryClient.QueryOfferByAddr(context.Background(), &types.QueryOfferByAddrRequest{Offerer: args[0]})
 			if err != nil {
 				return err
 			}

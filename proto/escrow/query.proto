@@ -11,20 +11,18 @@ option go_package = "github.com/interchainberlin/pooltoy/x/escrow/types";
 service Query {
   // this line is used by starport scaffolding # 2
   rpc QueryOfferListAll (OfferListAllRequest) returns (OfferListResponse);
-  rpc QueryOfferByID (QueryOfferByIDRequest) returns (Offer);
+  rpc QueryOfferByID (QueryOfferByIDRequest) returns (OfferListResponse);
   rpc QueryOfferByAddr (QueryOfferByAddrRequest) returns (OfferListResponse);
 }
 
 message OfferListAllRequest {}
 
 message QueryOfferByIDRequest{
-  string querier = 1;
-  int64 id = 2;
+  int64 id = 1;
 }
 
 message QueryOfferByAddrRequest {
-  string querier = 1;
-  string offerer = 2;
+  string offerer = 1;
 }
 
 message OfferListResponse {

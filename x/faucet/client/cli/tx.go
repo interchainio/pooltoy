@@ -2,8 +2,6 @@ package cli
 
 import (
 	"fmt"
-	"github.com/interchainberlin/pooltoy/x/faucet/utils"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
@@ -75,7 +73,6 @@ func txMintFor() *cobra.Command {
 				return err
 			}
 			msg := types.NewMsgMint(sender, minter, args[1])
-
 			if err = msg.ValidateBasic(); err != nil {
 				return fmt.Errorf("message validation failed: %w", err)
 			}

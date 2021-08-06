@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"fmt"
-	"github.com/interchainberlin/pooltoy/x/faucet/utils"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -56,7 +55,6 @@ func (k Keeper) Logger(ctx sdk.Context) log.Logger {
 // MintAndSend mint coins and send to receiver.
 func (k Keeper) MintAndSend(ctx sdk.Context, msg *types.MsgMint) error {
 	// TODO: should most of this logic be in the msg_server?
-
 
 	mintTime := ctx.BlockTime().Unix()
 	if msg.Denom == k.StakingKeeper.BondDenom(ctx) {

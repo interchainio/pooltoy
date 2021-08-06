@@ -14,7 +14,6 @@ service Query {
   rpc QueryListUsers(QueryListUsersRequest) returns (QueryListUsersResponse) {
     option (google.api.http).get = "/pooltoy/user";
   }
-  rpc QueryMostEmojiOwner(QueryMostEmojiOwnerRequest) returns (QueryMostEmojiOwnerResponse){}
 }
 
 message QueryListUsersRequest {

@@ -1,4 +1,5 @@
 #!/bin/bash
+
 rm -rf ~/.pooltoy
 
 pooltoy config keyring-backend test
@@ -8,7 +9,7 @@ pooltoy config
 
 pooltoy init mynode --chain-id pooltoy-5
 
-jq -c '.balances[]' accounts1.json | while read i; do
+jq -c '.balances[]' accounts.json | while read i; do
     echo "y" | pooltoy keys add $(echo "$i" | jq -r ".name") --keyring-backend test
     pooltoy add-genesis-account $(pooltoy keys show $(echo "$i" | jq -r ".name") --address) $(echo $i | jq -r '.coins | map(.amount+.denom) | join(",")') --keyring-backend test
 done

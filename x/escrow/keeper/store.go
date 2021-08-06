@@ -11,15 +11,21 @@ import (
 	//	"github.com/cosmos/cosmos-sdk/types/address"
 )
 
-func (k Keeper) InsertOffer(ctx sdk.Context, offer types.Offer) ([]byte, error) {
+func (k Keeper) InsertOffer(ctx sdk.Context, offerReq types.OfferRequest) ([]byte, error) {
 	store := ctx.KVStore(k.storeKey)
-	addr, err := sdk.AccAddressFromBech32(offer.Sender)
+	addr, err := sdk.AccAddressFromBech32(offerReq.Sender)
 	if err != nil {
 		return []byte{}, err
 	}
 	storeK := []byte(types.OfferPrefix)
 	storeK = append(storeK, addr...)
 	id := k.GetUpdatedID(ctx)
+	offer := types.Offer{
+		Sender: offerReq.Sender,
+		Amount: offerReq.Amount,
+		Request: offerReq.Request,
+		Id: id,
+	}
 	storeK = append(storeK, []byte(strconv.FormatInt(id, 10))...)
 
 	// todo maybe we do not need int64 for index
@@ -30,6 +36,30 @@ func (k Keeper) InsertOffer(ctx sdk.Context, offer types.Offer) ([]byte, error) 
 
 	store.Set(storeK, storeV)
 	return storeV, nil
+}
+
+func (k Keeper) DeleteOffer(ctx sdk.Context, id int64) error {
+	store := ctx.KVStore(k.storeKey)
+	iterator := sdk.KVStorePrefixIterator(store, []byte(types.OfferPrefix))
+	defer iterator.Close()
+
+	foundID := false
+	for ; iterator.Valid(); iterator.Next() {
+		idBytes := iterator.Key()[types.AddrPrefixLen:]
+		i, err := BytesToInt64(idBytes)
+		if err != nil {
+			return errors.New("convert ID failed")
+		}
+		if i == id {
+			foundID = true
+			store.Delete(iterator.Key())
+		}
+	}
+	// the ID not found
+	if foundID == false {
+		return errors.New("ID not found")
+	}
+	return nil
 }
 
 func (k Keeper) ListOffer(ctx sdk.Context, offer types.OfferListAllRequest) (types.OfferListResponse, error) {
@@ -57,6 +87,7 @@ func (k Keeper) ListOfferByAddr(ctx sdk.Context, offer types.QueryOfferByAddrReq
 
 	iterator := addrStore.Iterator(nil, nil)
 	defer iterator.Close()
+
 	offers := []*types.Offer{}
 	for ; iterator.Valid(); iterator.Next() {
 		var offer types.Offer
@@ -102,6 +133,7 @@ func (k Keeper) ListOfferByID(ctx sdk.Context, offerReq types.QueryOfferByIDRequ
 	if offer.Sender == "" {
 		return offer, errors.New("ID not found")
 	}
+
 	return offer, nil
 }
 
@@ -114,9 +146,9 @@ func BytesToInt64(b []byte) (int64, error) {
 }
 
 // store for record latest ID
-func (k Keeper) GetLatestID(ctx sdk.Context) int64{
+func (k Keeper) GetLatestID(ctx sdk.Context) int64 {
 	idStore := ctx.KVStore(k.idStoreKey)
-	if !idStore.Has([]byte(types.IDStoreKey)){
+	if !idStore.Has([]byte(types.IDStoreKey)) {
 		// store is empty
 		return int64(-1)
 	}
@@ -127,10 +159,10 @@ func (k Keeper) GetLatestID(ctx sdk.Context) int64{
 }
 
 // store id + 1
-func (k Keeper) GetUpdatedID(ctx sdk.Context) int64{
+func (k Keeper) GetUpdatedID(ctx sdk.Context) int64 {
 	id := k.GetLatestID(ctx)
 	idStore := ctx.KVStore(k.idStoreKey)
 	idStore.Set([]byte(types.IDStoreKey), []byte(strconv.FormatInt(id+1, 10)))
 
-	return  id+1
+	return id + 1
 }

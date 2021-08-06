@@ -1,50 +1,115 @@
 package types
 
 import (
-	fmt "fmt"
+	 "fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 var (
-	_ sdk.Msg = &Offer{}
+	_ sdk.Msg = &OfferRequest{}
+	_ sdk.Msg = &ResponseRequest{}
+	_ sdk.Msg = &CancelOfferRequest{}
 )
 
 const (
-	TypeOffer = "offer"
+	TypeOfferRequest = "offer"
+	TypeResponseRequest = "response"
+	TypeCancelOfferRequest = "CancelOffer"
 )
 
 // NewMsgMint is a constructor function for NewMsgMint
-func NewOfferRequest(sender sdk.AccAddress, amount string, request string) *Offer {
+func NewOfferRequest(sender sdk.AccAddress, amount string, request string) *OfferRequest {
 	amt,_ := sdk.ParseCoinsNormalized(amount)
 	req,_ := sdk.ParseCoinsNormalized(request)
-	return &Offer{Sender: sender.String(), Amount: amt, Request: req}
+	return &OfferRequest{Sender: sender.String(), Amount: amt, Request: req}
 }
 
 // Route should return the name of the module
-func (msg *Offer) Route() string { return RouterKey }
+func (msg *OfferRequest) Route() string { return RouterKey }
 
 // Type should return the action
-func (msg *Offer) Type() string { return TypeOffer}
+func (msg *OfferRequest) Type() string { return TypeOfferRequest}
 
 // ValidateBasic runs stateless checks on the message
-func (msg *Offer) ValidateBasic() error {
-	//addr, err := sdk.AccAddressFromBech32(msg.Sender)
-	//fmt.Println("validation basic!!!!", addr)
-	//if err != nil {
-	//	return sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, msg.Sender)
-	//}
-	//// todo add more validation
+func (msg *OfferRequest) ValidateBasic() error {
+	// todo add more validation
 
 	return nil
 }
 
 // GetSignBytes encodes the message for signing
-func (msg *Offer) GetSignBytes() []byte {
+func (msg *OfferRequest) GetSignBytes() []byte {
 	panic("amino support disabled")
 }
 
 // GetSigners defines whose signature is required
-func (msg *Offer) GetSigners() []sdk.AccAddress {
+func (msg *OfferRequest) GetSigners() []sdk.AccAddress {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		fmt.Println(err)
+		// panic(err)
+	}
+	return []sdk.AccAddress{sdk.AccAddress(sender)}
+}
+
+func NewResponseRequest(sender sdk.AccAddress, id int64) *ResponseRequest {
+	return &ResponseRequest{Sender: sender.String(), Id: id}
+}
+
+// Route should return the name of the module
+func (msg *ResponseRequest) Route() string { return RouterKey }
+
+// Type should return the action
+func (msg *ResponseRequest) Type() string { return TypeResponseRequest}
+
+// ValidateBasic runs stateless checks on the message
+func (msg *ResponseRequest) ValidateBasic() error {
+	// todo add more validation
+	return nil
+}
+
+// GetSignBytes encodes the message for signing
+func (msg *ResponseRequest) GetSignBytes() []byte {
+	panic("amino support disabled")
+}
+
+// GetSigners defines whose signature is required
+func (msg *ResponseRequest) GetSigners() []sdk.AccAddress {
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		fmt.Println(err)
+		// panic(err)
+	}
+	return []sdk.AccAddress{sdk.AccAddress(sender)}
+}
+
+
+
+func NewCancelOfferRequest(addr sdk.Address, id int64) *CancelOfferRequest {
+	return &CancelOfferRequest{Sender:addr.String(), Id: id}
+}
+
+// Route should return the name of the module
+func (msg *CancelOfferRequest) Route() string { return RouterKey }
+
+// Type should return the action
+func (msg *CancelOfferRequest) Type() string { return TypeCancelOfferRequest}
+
+// ValidateBasic runs stateless checks on the message
+func (msg *CancelOfferRequest) ValidateBasic() error {
+
+	// todo add more validation
+
+	return nil
+}
+
+// GetSignBytes encodes the message for signing
+func (msg *CancelOfferRequest) GetSignBytes() []byte {
+	panic("amino support disabled")
+}
+
+// GetSigners defines whose signature is required
+func (msg *CancelOfferRequest) GetSigners() []sdk.AccAddress {
 	sender, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		fmt.Println(err)

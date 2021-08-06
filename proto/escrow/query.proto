@@ -1,9 +1,9 @@
 syntax = "proto3";
 package escrow;
 
+import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "escrow/tx.proto";
-// this line is used by starport scaffolding # 1
+import "cosmos/base/v1beta1/coin.proto";
 
 option go_package = "github.com/interchainberlin/pooltoy/x/escrow/types";
 
@@ -29,3 +29,11 @@ message OfferListResponse {
   repeated Offer offerList = 1;
 }
 
+message Offer {
+  string sender = 1;
+  repeated cosmos.base.v1beta1.Coin amount = 2
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  repeated cosmos.base.v1beta1.Coin request = 3
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  int64 id =4;
+}

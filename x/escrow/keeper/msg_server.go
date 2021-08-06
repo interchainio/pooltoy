@@ -21,7 +21,7 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 var _ types.MsgServer = Keeper{}
 
 // todo: merge OfferSend and Offer into 1
-func (k Keeper) Offer(c context.Context, msg *types.Offer) (*types.OfferResponse, error) {
+func (k Keeper) Offer(c context.Context, msg *types.OfferRequest) (*types.OfferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	res, err := k.OfferSend(ctx, msg)
 	if err != nil {
@@ -36,26 +36,76 @@ func (k Keeper) Offer(c context.Context, msg *types.Offer) (*types.OfferResponse
 	return res, nil
 }
 
-func (k Keeper) OfferSend(ctx sdk.Context, msg *types.Offer) (*types.OfferResponse, error) {
-
+func (k Keeper) OfferSend(ctx sdk.Context, msg *types.OfferRequest) (*types.OfferResponse, error) {
 	addr, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return &types.OfferResponse{}, err
 	}
-//	coins, err := sdk.ParseCoinsNormalized(msg.Amount)
-//	if err != nil {
-//		return &types.OfferResponse{}, err
-//	}
 
-	//	moduleAcc:= k.AccountKeeper.GetModuleAddress(types.ModuleName)
-
-	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, addr,types.ModuleName,msg.Amount)
+	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, msg.Amount)
 	if err != nil {
 		return &types.OfferResponse{}, err
 	}
 
-
-	//*k.index +=1   // some checks this index is not in store
 	return &types.OfferResponse{Sender: msg.Sender, Index: k.GetLatestID(ctx)}, nil
 }
 
+func (k Keeper) Response(c context.Context, msg *types.ResponseRequest) (*types.ResponseResult, error) {
+	responser, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+	offer, err := k.QueryOfferByID(c, &types.QueryOfferByIDRequest{msg.Id})
+	if err != nil {
+		return nil, err
+	}
+	offerer, err := sdk.AccAddressFromBech32(offer.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	escrowAcc :=k.AccountKeeper.GetModuleAccount(ctx, types.ModuleName)
+	err = k.BankKeeper.SendCoins(ctx, escrowAcc.GetAddress(), responser, offer.Amount)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.BankKeeper.SendCoins(ctx, responser, offerer, offer.Request)
+
+	err = k.DeleteOffer(ctx, msg.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.ResponseResult{}, nil
+}
+
+
+func (k Keeper) CancelOffer(c context.Context, msg *types.CancelOfferRequest) (*types.CancelOfferResponse, error) {
+	ctx := sdk.UnwrapSDKContext(c)
+	offer, err := k.QueryOfferByID(c, &types.QueryOfferByIDRequest{msg.Id})
+	if err != nil {
+		return nil, err
+	}
+	if offer.Sender != msg.Sender{
+		return nil, sdkerrors.Wrap(err, fmt.Sprintf("unauthorized to cancel this offer"))
+	}
+
+	offerer, err := sdk.AccAddressFromBech32(offer.Sender)
+	if err != nil {
+		return nil, err
+	}
+	escrowAcc :=k.AccountKeeper.GetModuleAccount(ctx, types.ModuleName)
+	err = k.BankKeeper.SendCoins(ctx, escrowAcc.GetAddress(), offerer, offer.Amount)
+	if err != nil {
+		return nil, err
+	}
+
+	err = k.DeleteOffer(ctx, msg.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.CancelOfferResponse{}, nil
+}

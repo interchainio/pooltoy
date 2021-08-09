@@ -2,13 +2,14 @@ package cli
 
 import (
 	"fmt"
+	"strconv"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
-	"strconv"
 
 	//"github.com/cosmos/cosmos-sdk/client/tx"
-	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/spf13/cobra"
 	// "github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/interchainberlin/pooltoy/x/escrow/types"
@@ -31,19 +32,15 @@ func GetTxCmd() *cobra.Command {
 
 func escrowOffer() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "offer [address] [offer] [request] --from [username]",
+		Use:   "offer [offer] [request] --from [username]",
 		Short: "send coins to escrow",
-		Args:  cobra.ExactArgs(3),
+		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-
-			addr, err := sdk.AccAddressFromBech32(args[0])
-			if err != nil {
-				return err
-			}
+			addr := ctx.FromAddress
 
 			offerReq := types.NewOfferRequest(addr, args[1], args[2])
 
@@ -56,7 +53,7 @@ func escrowOffer() *cobra.Command {
 
 func escrowResponse() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "response [address] [id] --from [username]",
+		Use:   "response [id] --from [username]",
 		Short: "response to an offer at escrow",
 		Args:  cobra.ExactArgs(2),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -64,11 +61,8 @@ func escrowResponse() *cobra.Command {
 			if err != nil {
 				return err
 			}
+			addr := ctx.FromAddress
 
-			addr, err := sdk.AccAddressFromBech32(args[0])
-			if err != nil {
-				return err
-			}
 			i, err := strconv.ParseInt(args[1], 10, 64)
 			if err != nil {
 				return err
@@ -85,18 +79,17 @@ func escrowResponse() *cobra.Command {
 
 func escrowCancelOffer() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cancel [address] [id] --from [username]",
+		Use:   "cancel [id] --from [username]",
 		Short: "cancel an offer",
-		Args:  cobra.ExactArgs(2),
+		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx, err := client.GetClientTxContext(cmd)
 			if err != nil {
 				return err
 			}
-			addr, err := sdk.AccAddressFromBech32(args[0])
-			if err != nil {
-				return err
-			}
+
+			addr := ctx.FromAddress
+
 			i, err := strconv.ParseInt(args[1], 10, 64)
 			if err != nil {
 				return err

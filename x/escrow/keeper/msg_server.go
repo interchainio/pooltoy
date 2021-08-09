@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/interchainberlin/pooltoy/x/escrow/types"
@@ -65,7 +66,7 @@ func (k Keeper) Response(c context.Context, msg *types.ResponseRequest) (*types.
 		return nil, err
 	}
 
-	escrowAcc :=k.AccountKeeper.GetModuleAccount(ctx, types.ModuleName)
+	escrowAcc := k.AccountKeeper.GetModuleAccount(ctx, types.ModuleName)
 	err = k.BankKeeper.SendCoins(ctx, escrowAcc.GetAddress(), responser, offer.Amount)
 	if err != nil {
 		return nil, err
@@ -81,31 +82,45 @@ func (k Keeper) Response(c context.Context, msg *types.ResponseRequest) (*types.
 	return &types.ResponseResult{}, nil
 }
 
-
 func (k Keeper) CancelOffer(c context.Context, msg *types.CancelOfferRequest) (*types.CancelOfferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	offer, err := k.QueryOfferByID(c, &types.QueryOfferByIDRequest{msg.Id})
+	fmt.Println("offer", offer)
 	if err != nil {
 		return nil, err
-	}
-	if offer.Sender != msg.Sender{
-		return nil, sdkerrors.Wrap(err, fmt.Sprintf("unauthorized to cancel this offer"))
 	}
 
 	offerer, err := sdk.AccAddressFromBech32(offer.Sender)
+	fmt.Println("offerer", offerer)
 	if err != nil {
 		return nil, err
 	}
-	escrowAcc :=k.AccountKeeper.GetModuleAccount(ctx, types.ModuleName)
+
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	fmt.Println("sender", sender)
+	if err != nil {
+		return nil, err
+	}
+
+	if !offerer.Equals(sender) {
+		fmt.Println("offer.Sender != msg.Sender")
+		return nil, sdkerrors.Wrap(XXXXX, fmt.Sprintf("unauthorized to cancel this offer"))
+	}
+	fmt.Println("offer.Sender == msg.Sender")
+
+	escrowAcc := k.AccountKeeper.GetModuleAccount(ctx, types.ModuleName)
+	fmt.Println("escrowAcc", escrowAcc)
 	err = k.BankKeeper.SendCoins(ctx, escrowAcc.GetAddress(), offerer, offer.Amount)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("send coins successful")
 
 	err = k.DeleteOffer(ctx, msg.Id)
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("delete offer successful")
 
 	return &types.CancelOfferResponse{}, nil
 }

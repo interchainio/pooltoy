@@ -88,14 +88,20 @@ func (k Keeper) CancelOffer(c context.Context, msg *types.CancelOfferRequest) (*
 	if err != nil {
 		return nil, err
 	}
-	if offer.Sender != msg.Sender{
-		return nil, sdkerrors.Wrap(err, fmt.Sprintf("unauthorized to cancel this offer"))
-	}
-
 	offerer, err := sdk.AccAddressFromBech32(offer.Sender)
 	if err != nil {
 		return nil, err
 	}
+
+	sender, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		return nil, err
+	}
+
+	if !offerer.Equals(sender) {
+		return nil, sdkerrors.ErrUnauthorized
+	}
+
 	escrowAcc :=k.AccountKeeper.GetModuleAccount(ctx, types.ModuleName)
 	err = k.BankKeeper.SendCoins(ctx, escrowAcc.GetAddress(), offerer, offer.Amount)
 	if err != nil {

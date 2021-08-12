@@ -1,11 +1,6 @@
 package app
 
 import (
-	"github.com/interchainberlin/pooltoy/x/escrow"
-	"io"
-	"os"
-	"path/filepath"
-	"time"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/grpc/tmservice"
@@ -73,11 +68,16 @@ import (
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	appparams "github.com/interchainberlin/pooltoy/app/params"
 	"github.com/interchainberlin/pooltoy/regex"
+	"github.com/interchainberlin/pooltoy/x/escrow"
 	escrowkeeper "github.com/interchainberlin/pooltoy/x/escrow/keeper"
 	escrowtypes "github.com/interchainberlin/pooltoy/x/escrow/types"
 	"github.com/interchainberlin/pooltoy/x/faucet"
 	faucetkeeper "github.com/interchainberlin/pooltoy/x/faucet/keeper"
 	faucettypes "github.com/interchainberlin/pooltoy/x/faucet/types"
+	"io"
+	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/interchainberlin/pooltoy/x/pooltoy"
 	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
@@ -460,7 +460,7 @@ func New(
 
 	if upgradeInfo.Name == "pooltoy-upgrade-0" && !app.UpgradeKeeper.IsSkipHeight(upgradeInfo.Height) {
 		storeUpgrades := store.StoreUpgrades{
-			// Added: []string{liquiditytypes.ModuleName},
+			 Added: []string{escrowtypes.ModuleName},
 		}
 
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades

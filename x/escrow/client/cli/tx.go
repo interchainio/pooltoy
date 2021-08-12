@@ -42,7 +42,7 @@ func escrowOffer() *cobra.Command {
 			}
 			addr := ctx.FromAddress
 
-			offerReq := types.NewOfferRequest(addr, args[1], args[2])
+			offerReq := types.NewOfferRequest(addr, args[0], args[1])
 
 			return tx.GenerateOrBroadcastTxCLI(ctx, cmd.Flags(), offerReq)
 		},
@@ -88,13 +88,11 @@ func escrowCancelOffer() *cobra.Command {
 				return err
 			}
 
-			addr := ctx.FromAddress
-
-			i, err := strconv.ParseInt(args[1], 10, 64)
+			i, err := strconv.ParseInt(args[0], 10, 64)
 			if err != nil {
 				return err
 			}
-			cancelReq := types.NewCancelOfferRequest(addr, i)
+			cancelReq := types.NewCancelOfferRequest(ctx.FromAddress, i)
 			return tx.GenerateOrBroadcastTxCLI(ctx, cmd.Flags(), cancelReq)
 
 		},

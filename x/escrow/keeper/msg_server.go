@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/interchainberlin/pooltoy/x/escrow/types"
@@ -20,23 +19,8 @@ func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 
 var _ types.MsgServer = Keeper{}
 
-// todo: merge OfferSend and Offer into 1
 func (k Keeper) Offer(c context.Context, msg *types.OfferRequest) (*types.OfferResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
-	res, err := k.OfferSend(ctx, msg)
-	if err != nil {
-		return nil, sdkerrors.Wrap(err, fmt.Sprintf("unable to offer"))
-	}
-
-	_, err = k.InsertOffer(ctx, *msg)
-	if err != nil {
-		return nil, err
-	}
-
-	return res, nil
-}
-
-func (k Keeper) OfferSend(ctx sdk.Context, msg *types.OfferRequest) (*types.OfferResponse, error) {
 	addr, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return &types.OfferResponse{}, err
@@ -45,6 +29,11 @@ func (k Keeper) OfferSend(ctx sdk.Context, msg *types.OfferRequest) (*types.Offe
 	err = k.BankKeeper.SendCoinsFromAccountToModule(ctx, addr, types.ModuleName, msg.Amount)
 	if err != nil {
 		return &types.OfferResponse{}, err
+	}
+
+	_, err = k.InsertOffer(ctx, *msg)
+	if err != nil {
+		return nil, err
 	}
 
 	return &types.OfferResponse{Sender: msg.Sender, Index: k.GetLatestID(ctx)}, nil

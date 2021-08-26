@@ -61,7 +61,7 @@ Please note:
 
 Presently pooltoy is designed to work together with slackbot to trade emoji in slack chat, slack controls the user authorization. So when you run pooltoy alone, you have permissions to use all the accounts on the pooltoy chain. You can play the role of admin or any other user's role. For example, you can send from any account to another if both accounts exist, and the sender has sufficient funds.
 
-### queries
+### Queries
 ##### query account info
 ```shell
 # account info

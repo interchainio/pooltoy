@@ -46,17 +46,17 @@ func (k Keeper) CreateUser(c context.Context, msg *types.MsgCreateUser) (*types.
 	}
 
 	// creator must be an admin
-	if creator.IsAdmin {
+	// if creator.IsAdmin {
 		// if yes
 		if err := k.InsertUser(ctx, u); err != nil {
 			return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, fmt.Sprintf("error marshaling u.UserAccount %s", u.UserAccount))
 		}
-	} else {
-		// if no
-		// throw error
-		errMsg := fmt.Sprintf("user %s (%s) is not an admin", creator.Name, msg.Creator)
-		return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
-	}
+	//} else {
+	//	// if no
+	//	// throw error
+	//	errMsg := fmt.Sprintf("user %s (%s) is not an admin", creator.Name, msg.Creator)
+	//	return nil, sdkerrors.Wrap(sdkerrors.ErrUnauthorized, errMsg)
+	//}
 
 	return &types.MsgCreateUserResponse{}, nil
 }

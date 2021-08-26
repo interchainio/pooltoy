@@ -3,3 +3,4 @@ frontend/dist
 frontend/.cache
 data/
 genesis.json
+pooltoy.iml

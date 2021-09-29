@@ -14,9 +14,9 @@ git clone git@github.com:interchainberlin/pooltoy.git
 
 cd pooltoy
 
-./scripts/init.sh
-
 make install
+
+./scripts/init.sh
 ```
 ## Start pooltoy
 ```shell

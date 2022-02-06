@@ -2,7 +2,6 @@ package keeper
 
 import (
 	"context"
-	"fmt"
 	"sort"
 	"time"
 
@@ -45,20 +44,11 @@ func (k Keeper) QueryWhenBrr(c context.Context, req *types.QueryWhenBrrRequest) 
 
 	lastTime := time.Unix(m.Lasttime, 0)
 	currentTime := time.Unix(mintTime, 0)
-
-	hr, min, sec := currentTime.Clock()
-	backHours := currentTime.Add(-time.Duration(hr) * time.Hour)
-	backMin := backHours.Add(-time.Duration(min) * time.Minute)
-	midnight := backMin.Add(-time.Duration(sec) * time.Second)
-
-	fmt.Println("lastTime: ", lastTime)
-	fmt.Println("currentTime: ", currentTime)
-	fmt.Println("Back in time: ", midnight)
-
+	midnight := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, time.Local)
 	isAfterMidnight := lastTime.After(midnight)
 
 	if isAfterMidnight {
-		timeLeft = int64(midnight.Add(24 * time.Hour).UTC().Sub(lastTime).Seconds())
+		timeLeft = int64(midnight.Add(24 * time.Hour).UTC().Sub(currentTime).Seconds())
 	} else {
 		timeLeft = 0
 	}

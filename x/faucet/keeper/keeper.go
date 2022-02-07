@@ -61,14 +61,17 @@ func (k Keeper) MintAndSend(ctx sdk.Context, msg *types.MsgMint) error {
 		return types.ErrCantWithdrawStake
 	}
 
-	// refuse mint in 24 hours
+	// Refuse mint within same 24 hour period from midnight on one day to the following day
 	a, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return err
 	}
 	m := k.getMintHistory(ctx, a)
+	currentTime := time.Unix(mintTime, 0)
+	midnight := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, time.UTC)
+
 	if k.isPresent(ctx, a) &&
-		time.Unix(int64(m.Lasttime), 0).Add(k.Limit).UTC().After(time.Unix(mintTime, 0)) {
+		time.Unix(int64(m.Lasttime), 0).After(midnight) {
 		return types.ErrWithdrawTooOften
 	}
 

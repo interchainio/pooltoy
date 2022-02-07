@@ -68,7 +68,7 @@ func (k Keeper) MintAndSend(ctx sdk.Context, msg *types.MsgMint) error {
 	}
 	m := k.getMintHistory(ctx, a)
 	currentTime := time.Unix(mintTime, 0)
-	midnight := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, time.Local)
+	midnight := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, time.UTC)
 
 	if k.isPresent(ctx, a) &&
 		time.Unix(int64(m.Lasttime), 0).After(midnight) {

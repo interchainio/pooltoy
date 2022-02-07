@@ -48,7 +48,7 @@ func (k Keeper) QueryWhenBrr(c context.Context, req *types.QueryWhenBrrRequest) 
 	isAfterMidnight := lastTime.After(midnight)
 
 	if isAfterMidnight {
-		timeLeft = int64(midnight.Add(24 * time.Hour).UTC().Sub(currentTime).Seconds())
+		timeLeft = int64(midnight.AddDate(0, 0, 1).Sub(currentTime).Seconds())
 	} else {
 		timeLeft = 0
 	}

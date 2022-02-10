@@ -2,7 +2,6 @@ package types
 
 import (
 	fmt "fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -18,7 +17,7 @@ const (
 // NewMsgMint is a constructor function for NewMsgMint
 func NewMsgMint(sender sdk.AccAddress, minter sdk.AccAddress, denom string) *MsgMint {
 	return &MsgMint{Sender: sender.String(), Minter: minter.String(), Denom: denom}
-}
+}  //todo no need to be addr, string as arg is fine
 
 // Route should return the name of the module
 func (msg *MsgMint) Route() string { return RouterKey }

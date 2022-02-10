@@ -1,4 +1,5 @@
 #!/bin/bash
+
 rm -rf ~/.pooltoy
 
 pooltoy config keyring-backend test

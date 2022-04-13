@@ -21,10 +21,10 @@ type Keeper struct {
 	BankKeeper    bankkeeper.Keeper
 	StakingKeeper stakingkeeper.Keeper
 	AccountKeeper authkeeper.AccountKeeper
-	amount        int64                 // set default amount for each mint.
-	Limit         time.Duration         // rate limiting for mint, etc 24 * time.Hours
-	storeKey      sdk.StoreKey          // Unexposed key to access store from sdk.Context
-	cdc           codec.BinaryMarshaler //
+	amount        int64             // set default amount for each mint.
+	Limit         time.Duration     // rate limiting for mint, etc 24 * time.Hours
+	storeKey      sdk.StoreKey      // Unexposed key to access store from sdk.Context
+	cdc           codec.BinaryCodec //
 }
 
 // NewKeeper creates new instances of the Faucet Keeper
@@ -35,7 +35,7 @@ func NewKeeper(
 	amount int64,
 	rateLimit time.Duration,
 	storeKey sdk.StoreKey,
-	cdc codec.BinaryMarshaler) Keeper {
+	cdc codec.BinaryCodec) Keeper {
 	return Keeper{
 		BankKeeper:    bankKeeper,
 		StakingKeeper: stakingKeeper,
@@ -112,7 +112,7 @@ func (k Keeper) getMintHistory(ctx sdk.Context, minter sdk.AccAddress) types.Min
 
 	bz := store.Get([]byte(minter))
 	var history types.MintHistory
-	k.cdc.MustUnmarshalBinaryBare(bz, &history)
+	k.cdc.MustUnmarshal(bz, &history)
 	return history
 }
 
@@ -128,7 +128,7 @@ func (k Keeper) setMintHistory(ctx sdk.Context, minter sdk.AccAddress, history t
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	store.Set([]byte(minter), k.cdc.MustMarshalBinaryBare(&history))
+	store.Set([]byte(minter), k.cdc.MustMarshal(&history))
 }
 
 // IsPresent check if the name is present in the store or not

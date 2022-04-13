@@ -18,7 +18,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			res, err := k.Mint(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized faucet Msg type: %v", msg.Type()))
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("unrecognized faucet msg type: %s", sdk.MsgTypeURL(msg)))
 		}
 	}
 }

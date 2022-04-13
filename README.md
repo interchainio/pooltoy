@@ -4,7 +4,7 @@ Pooltoy is an emoji blockchain built based on [cosmos-sdk](https://github.com/co
 
 Pooltoy can not only be run independently as a chain, but also work together  with [Slackbot](https://github.com/interchainberlin/slackbot) to send emojis on slack.
 
-![pool toy blockchain](./notes/cover_resize.jpg)
+![pooltoy blockchain](./notes/cover_resize.jpg)
 
 ## Install the binary
 

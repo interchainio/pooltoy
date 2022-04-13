@@ -2,9 +2,8 @@ DOCKER := $(shell which docker)
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
 
 # TODO: Update the ldflags with the app, client & server names
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=NewApp \
-	-X github.com/cosmos/cosmos-sdk/version.ServerName=pooltoyd \
-	-X github.com/cosmos/cosmos-sdk/version.ClientName=pooltoycli \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=pooltoy \
+	-X github.com/cosmos/cosmos-sdk/version.AppName=pooltoyd \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
 

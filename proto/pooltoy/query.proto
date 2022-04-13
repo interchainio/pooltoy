@@ -16,9 +16,6 @@ service Query {
   }
 }
 
-message QueryListUsersRequest {
-}
+message QueryListUsersRequest {}
 
-message QueryListUsersResponse {
-  repeated User users = 1;
-}
+message QueryListUsersResponse { repeated User users = 1; }

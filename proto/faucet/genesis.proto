@@ -5,7 +5,5 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/interchainio/pooltoy/x/faucet/types";
 
-
 // GenesisState - all oracle state that must be provided at genesis
 message GenesisState {}
-

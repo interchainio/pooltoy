@@ -4,9 +4,8 @@ package pooltoy;
 option go_package = "github.com/interchainio/pooltoy/x/pooltoy/types";
 import "pooltoy/user.proto";
 
-
 service Msg {
- rpc CreateUser(MsgCreateUser) returns (MsgCreateUserResponse) {}
+  rpc CreateUser(MsgCreateUser) returns (MsgCreateUserResponse) {}
 }
 
 message MsgCreateUser {

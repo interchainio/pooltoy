@@ -56,6 +56,6 @@ proto-format:
 	find ./ -not -path "./third_party/*" -name *.proto -exec clang-format -i {} \;
 
 proto-lint:
-	@$(DOCKER_BUF) check lint --error-format=json
+	@$(DOCKER_BUF) lint --error-format=json
 
 .PHONY: proto-all proto-gen proto-format proto-lint

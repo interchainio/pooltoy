@@ -8,6 +8,4 @@ import "google/protobuf/any.proto";
 option go_package = "github.com/interchainio/pooltoy/x/pooltoy/types";
 import "pooltoy/user.proto";
 
-message GenesisState {
-  repeated User users = 1;
-}
+message GenesisState { repeated User users = 1; }

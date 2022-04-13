@@ -4,12 +4,11 @@ package pooltoy;
 option go_package = "github.com/interchainio/pooltoy/x/pooltoy/types";
 import "gogoproto/gogo.proto";
 
-
 message User {
-  string id           = 1;
-  string creator      = 2;
-  string user_account = 3 [(gogoproto.jsontag) = "userAccount"];
-  bool   is_admin     = 4 [(gogoproto.jsontag) = "isAdmin"];
-  string name         = 5;
-  string email        = 6;
+  string id = 1;
+  string creator = 2;
+  string user_account = 3 [ (gogoproto.jsontag) = "userAccount" ];
+  bool is_admin = 4 [ (gogoproto.jsontag) = "isAdmin" ];
+  string name = 5;
+  string email = 6;
 }

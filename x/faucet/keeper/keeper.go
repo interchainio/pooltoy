@@ -10,7 +10,7 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/interchainberlin/pooltoy/x/faucet/types"
+	"github.com/interchainio/pooltoy/x/faucet/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
 

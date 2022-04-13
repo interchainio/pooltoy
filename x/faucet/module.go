@@ -10,9 +10,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/gorilla/mux"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/interchainberlin/pooltoy/x/faucet/client/cli"
-	"github.com/interchainberlin/pooltoy/x/faucet/keeper"
-	"github.com/interchainberlin/pooltoy/x/faucet/types"
+	"github.com/interchainio/pooltoy/x/faucet/client/cli"
+	"github.com/interchainio/pooltoy/x/faucet/keeper"
+	"github.com/interchainio/pooltoy/x/faucet/types"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 )

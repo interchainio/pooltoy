@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/interchainberlin/pooltoy/x/faucet/keeper"
-	"github.com/interchainberlin/pooltoy/x/faucet/types"
+	"github.com/interchainio/pooltoy/x/faucet/keeper"
+	"github.com/interchainio/pooltoy/x/faucet/types"
 )
 
 // NewHandler returns a handler for "faucet" type messages.

@@ -585,13 +585,6 @@ func New(
 		),
 	)
 	app.SetEndBlocker(app.EndBlocker)
-	// TODO
-	// app.UpgradeKeeper.SetUpgradeHandler("pooltoy-upgrade-0",
-	// 	func(ctx sdk.Context, _ upgradetypes.Plan, fromVM module.VersionMap) (module.VersionMap, error) {
-	// 		// a place to run genesis initialization logic for new modules that were just added as part of the upgrade...
-
-	// 		return nil, nil
-	// 	})
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {

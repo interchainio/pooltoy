@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@tendermint/sig": "^0.6.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.2",
     "bip39": "^3.0.2",
     "core-js": "^3.6.5",
     "vue": "^2.6.11",

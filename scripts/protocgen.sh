@@ -38,5 +38,5 @@ done
 # go mod tidy
 
 # move proto files to the right places
-cp -r github.com/interchainberlin/pooltoy/* ./
+cp -r github.com/interchainio/pooltoy/* ./
 rm -rf github.com

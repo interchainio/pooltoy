@@ -9,6 +9,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
+
 type AccountExistsCheckDecorator struct {
 	ak         authkeeper.AccountKeeper
 	bankKeeper types.BankKeeper
@@ -51,6 +52,7 @@ func (ad AccountExistsCheckDecorator) AnteHandle(ctx sdk.Context, tx sdk.Tx, sim
 func NewAnteHandler(
 	ak authkeeper.AccountKeeper,
 	bankKeeper types.BankKeeper,
+	feegrantKeeper ante.FeegrantKeeper,
 	sigGasConsumer ante.SignatureVerificationGasConsumer,
 	signModeHandler signing.SignModeHandler,
 ) sdk.AnteHandler {
@@ -63,10 +65,9 @@ func NewAnteHandler(
 		ante.TxTimeoutHeightDecorator{},
 		ante.NewValidateMemoDecorator(ak),
 		ante.NewConsumeGasForTxSizeDecorator(ak),
-		ante.NewRejectFeeGranterDecorator(),
 		ante.NewSetPubKeyDecorator(ak), // SetPubKeyDecorator must be called before all signature verification decorators
 		ante.NewValidateSigCountDecorator(ak),
-		ante.NewDeductFeeDecorator(ak, bankKeeper),
+		ante.NewDeductFeeDecorator(ak, bankKeeper, feegrantKeeper),
 		ante.NewSigGasConsumeDecorator(ak, sigGasConsumer),
 		ante.NewSigVerificationDecorator(ak, signModeHandler),
 		ante.NewIncrementSequenceDecorator(ak),

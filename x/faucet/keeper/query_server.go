@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/interchainberlin/pooltoy/regex"
-	"github.com/interchainberlin/pooltoy/x/faucet/types"
+	"github.com/interchainio/pooltoy/regex"
+	"github.com/interchainio/pooltoy/x/faucet/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )

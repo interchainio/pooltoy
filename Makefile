@@ -2,9 +2,8 @@ DOCKER := $(shell which docker)
 DOCKER_BUF := $(DOCKER) run --rm -v $(CURDIR):/workspace --workdir /workspace bufbuild/buf
 
 # TODO: Update the ldflags with the app, client & server names
-ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=NewApp \
-	-X github.com/cosmos/cosmos-sdk/version.ServerName=pooltoyd \
-	-X github.com/cosmos/cosmos-sdk/version.ClientName=pooltoycli \
+ldflags = -X github.com/cosmos/cosmos-sdk/version.Name=pooltoy \
+	-X github.com/cosmos/cosmos-sdk/version.AppName=pooltoyd \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
 
@@ -22,7 +21,7 @@ install: go.sum
 
 go.sum: go.mod
 	@echo "--> Ensure dependencies have not been modified"
-	GO111MODULE=on go mod verify
+	@go mod verify
 
 # Uncomment when you have some tests
 # test:
@@ -56,6 +55,6 @@ proto-format:
 	find ./ -not -path "./third_party/*" -name *.proto -exec clang-format -i {} \;
 
 proto-lint:
-	@$(DOCKER_BUF) check lint --error-format=json
+	@$(DOCKER_BUF) lint --error-format=json
 
 .PHONY: proto-all proto-gen proto-format proto-lint

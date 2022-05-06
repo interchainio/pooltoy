@@ -5,9 +5,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	pooltoykeeper "github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
-	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
-	pooltoytypes "github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	pooltoykeeper "github.com/interchainio/pooltoy/x/pooltoy/keeper"
+	"github.com/interchainio/pooltoy/x/pooltoy/types"
+	pooltoytypes "github.com/interchainio/pooltoy/x/pooltoy/types"
 )
 
 func NewHandler(k pooltoykeeper.Keeper) sdk.Handler {

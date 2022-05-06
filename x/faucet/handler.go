@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/interchainberlin/pooltoy/x/faucet/keeper"
-	"github.com/interchainberlin/pooltoy/x/faucet/types"
+	"github.com/interchainio/pooltoy/x/faucet/keeper"
+	"github.com/interchainio/pooltoy/x/faucet/types"
 )
 
 // NewHandler returns a handler for "faucet" type messages.
@@ -18,7 +18,7 @@ func NewHandler(k keeper.Keeper) sdk.Handler {
 			res, err := k.Mint(sdk.WrapSDKContext(ctx), msg)
 			return sdk.WrapServiceResult(ctx, res, err)
 		default:
-			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("Unrecognized faucet Msg type: %v", msg.Type()))
+			return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, fmt.Sprintf("unrecognized faucet msg type: %s", sdk.MsgTypeURL(msg)))
 		}
 	}
 }

@@ -6,7 +6,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	"github.com/interchainio/pooltoy/x/pooltoy/types"
 	"github.com/spf13/cobra"
 )
 

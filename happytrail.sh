@@ -1,56 +1,56 @@
 #!/bin/bash
-# pooltoycli tx faucet mintfor $(pooltoycli keys show bob -a) 🚀 --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
-# pooltoycli tx send bob $(pooltoycli keys show alice -a) 1🚀 --from bob -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx
-# pooltoycli tx send you $(pooltoycli keys show me -a) 1token --from you -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx
-# pooltoycli tx send me $(pooltoycli keys show who -a) 1token --from me | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx
+# pooltoy tx faucet mintfor $(pooltoy keys show bob -a) 🚀 --from alice -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
+# pooltoy tx bank send bob $(pooltoy keys show alice -a) 1🚀 --from bob -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx
+# pooltoy tx bank send you $(pooltoy keys show me -a) 1token --from you -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx
+# pooltoy tx bank send me $(pooltoy keys show who -a) 1token --from me  -o json  | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx
 
 echo "make alice admin by alice"
-pooltoy tx pooltoy create-user $(pooltoy keys show alice -a) true billy billy@interchain.berlin --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx | jq ".raw_log"
+pooltoy tx pooltoy create-user $(pooltoy keys show alice -a) true billy billy@interchain.berlin --from alice -y -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json  | jq ".raw_log"
 
 echo "make bob admin by alice"
-pooltoy tx pooltoy create-user $(pooltoycli keys show bob -a) true sam sam@interchain.berlin --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
+pooltoy tx pooltoy create-user $(pooltoy keys show bob -a) true sam sam@interchain.berlin --from alice -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
 # echo "make carol non-admin by bob"
-# pooltoycli tx pooltoy create-user $(pooltoycli keys show carol -a) false marko marko@interchain.berlin --from bob -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
+# pooltoy tx pooltoy create-user $(pooltoy keys show carol -a) false marko marko@interchain.berlin --from bob -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
 
 # # this one should fail
 # echo "should fail"
-# pooltoycli tx pooltoy create-user $(pooltoycli keys show doug -a) false dieter dieter@interchain.berlin --from carol -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
+# pooltoy tx pooltoy create-user $(pooltoy keys show doug -a) false dieter dieter@interchain.berlin --from carol -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
 
 echo "how long til alice can mint?"
-pooltoy q faucet when-brrr $(pooltoycli keys show alice -a)
+pooltoy q faucet when-brrr $(pooltoy keys show alice -a)
 
 echo "alice mints 🚀 for bob"
-pooltoy tx faucet mintfor $(pooltoycli keys show bob -a) 🚀 --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx | jq ".raw_log"
+pooltoy tx faucet mintfor $(pooltoy keys show bob -a) 🚀 --from alice -y -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx -o json | jq ".raw_log"
 
 echo "how long til alice can mint?"
-pooltoy q faucet when-brrr $(pooltoycli keys show alice -a)
+pooltoy q faucet when-brrr $(pooltoy keys show alice -a)
 
 echo "can bob send to alice?"
-pooltoy tx send bob $(pooltoycli keys show alice -a) 1🚀 --from bob -y | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx | jq ".raw_log"
+pooltoy tx bank send bob $(pooltoy keys show alice -a) 1🚀 --from bob -y -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx -o json | jq ".raw_log"
 
 # echo "should fail"
-# pooltoycli tx faucet mintfor $(pooltoycli keys show carol -a) 🚀 --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
+# pooltoy tx faucet mintfor $(pooltoy keys show carol -a) 🚀 --from alice -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
 # echo "bob mints 🌝 for carol"
-# pooltoycli tx faucet mintfor $(pooltoycli keys show carol -a) 🌝 --from bob -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
+# pooltoy tx faucet mintfor $(pooltoy keys show carol -a) 🌝 --from bob -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx -o json | jq ".raw_log"
 # echo "carol mints 💸 for alice"
-# pooltoycli tx faucet mintfor $(pooltoycli keys show alice -a) 💸 --from carol -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
+# pooltoy tx faucet mintfor $(pooltoy keys show alice -a) 💸 --from carol -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
 
 # # this one should fail
+# echo "should fail"``
+# pooltoy tx faucet mintfor $(pooltoy keys show alice -a) 💸 --from carol -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
+
+# pooltoy q account $(pooltoy keys show alice -a)
+# pooltoy q account $(pooltoy keys show bob -a)
+# pooltoy q account $(pooltoy keys show carol -a)
+
+# pooltoy tx bank send alice $(pooltoy keys show bob -a) 1💸 --from alice -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
+# pooltoy tx bank send bob $(pooltoy keys show carol -a) 1🚀 --from bob -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
+# pooltoy tx bank send carol $(pooltoy keys show alice -a) 1🌝 --from carol -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
+
+# pooltoy q account $(pooltoy keys show alice -a)
+# pooltoy q account $(pooltoy keys show bob -a)
+# pooltoy q account $(pooltoy keys show carol -a)
+
 # echo "should fail"
-# pooltoycli tx faucet mintfor $(pooltoycli keys show alice -a) 💸 --from carol -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
-
-# pooltoycli q account $(pooltoycli keys show alice -a)
-# pooltoycli q account $(pooltoycli keys show bob -a)
-# pooltoycli q account $(pooltoycli keys show carol -a)
-
-# pooltoycli tx send alice $(pooltoycli keys show bob -a) 1💸 --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
-# pooltoycli tx send bob $(pooltoycli keys show carol -a) 1🚀 --from bob -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
-# pooltoycli tx send carol $(pooltoycli keys show alice -a) 1🌝 --from carol -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
-
-# pooltoycli q account $(pooltoycli keys show alice -a)
-# pooltoycli q account $(pooltoycli keys show bob -a)
-# pooltoycli q account $(pooltoycli keys show carol -a)
-
-# echo "should fail"
-# pooltoycli tx send alice $(pooltoycli keys show doug -a) 1🌝 --from alice -y | jq ".txhash" |  xargs $(sleep 6) pooltoycli q tx | jq ".raw_log"
+# pooltoy tx bank send alice $(pooltoy keys show doug -a) 1🌝 --from alice -y  -o json | jq ".txhash" |  xargs $(sleep 6) pooltoy q tx  -o json | jq ".raw_log"
 

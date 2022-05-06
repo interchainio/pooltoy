@@ -143,8 +143,8 @@
     },
     {
       "address": "cosmos1ztm25wkyfmw5nrth89lnyav3ygcusmsd9wkv84",
-      "really": "erik",
-      "name": "erik",
+      "really": "bob",
+      "name": "bob",
       "coins": [
         {
           "amount": "1",
@@ -763,7 +763,7 @@
         {
           "amount": "1",
           "denom": "🍕"
-       },
+        },
         {
           "amount": "1",
           "denom": "🎛️"

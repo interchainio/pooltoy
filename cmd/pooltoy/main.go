@@ -5,8 +5,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/server"
 	scmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/interchainberlin/pooltoy/app"
-	cmd "github.com/interchainberlin/pooltoy/cmd/pooltoy/cmd"
+	"github.com/interchainio/pooltoy/app"
+	cmd "github.com/interchainio/pooltoy/cmd/pooltoy/cmd"
 )
 
 func main() {

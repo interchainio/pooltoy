@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	"github.com/interchainio/pooltoy/x/pooltoy/types"
 )
 
 var _ types.MsgServer = Keeper{}

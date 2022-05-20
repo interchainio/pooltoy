@@ -2,8 +2,8 @@ package pooltoy
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/interchainberlin/pooltoy/x/pooltoy/keeper"
-	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	"github.com/interchainio/pooltoy/x/pooltoy/keeper"
+	"github.com/interchainio/pooltoy/x/pooltoy/types"
 )
 
 // InitGenesis initialize default parameters

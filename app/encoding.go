@@ -2,7 +2,7 @@ package app
 
 import (
 	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/interchainberlin/pooltoy/app/params"
+	"github.com/interchainio/pooltoy/app/params"
 )
 
 // MakeEncodingConfig creates an EncodingConfig for testing. This function

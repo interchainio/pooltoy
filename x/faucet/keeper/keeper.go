@@ -10,7 +10,7 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	bankkeeper "github.com/cosmos/cosmos-sdk/x/bank/keeper"
 	stakingkeeper "github.com/cosmos/cosmos-sdk/x/staking/keeper"
-	"github.com/interchainberlin/pooltoy/x/faucet/types"
+	"github.com/interchainio/pooltoy/x/faucet/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
@@ -21,10 +21,10 @@ type Keeper struct {
 	BankKeeper    bankkeeper.Keeper
 	StakingKeeper stakingkeeper.Keeper
 	AccountKeeper authkeeper.AccountKeeper
-	amount        int64                 // set default amount for each mint.
-	Limit         time.Duration         // rate limiting for mint, etc 24 * time.Hours
-	storeKey      sdk.StoreKey          // Unexposed key to access store from sdk.Context
-	cdc           codec.BinaryMarshaler //
+	amount        int64             // set default amount for each mint.
+	Limit         time.Duration     // rate limiting for mint, etc 24 * time.Hours
+	storeKey      sdk.StoreKey      // Unexposed key to access store from sdk.Context
+	cdc           codec.BinaryCodec //
 }
 
 // NewKeeper creates new instances of the Faucet Keeper
@@ -35,7 +35,7 @@ func NewKeeper(
 	amount int64,
 	rateLimit time.Duration,
 	storeKey sdk.StoreKey,
-	cdc codec.BinaryMarshaler) Keeper {
+	cdc codec.BinaryCodec) Keeper {
 	return Keeper{
 		BankKeeper:    bankKeeper,
 		StakingKeeper: stakingKeeper,
@@ -61,14 +61,17 @@ func (k Keeper) MintAndSend(ctx sdk.Context, msg *types.MsgMint) error {
 		return types.ErrCantWithdrawStake
 	}
 
-	// refuse mint in 24 hours
+	// Refuse mint within same 24 hour period from midnight on one day to the following day
 	a, err := sdk.AccAddressFromBech32(msg.Sender)
 	if err != nil {
 		return err
 	}
 	m := k.getMintHistory(ctx, a)
+	currentTime := time.Unix(mintTime, 0)
+	midnight := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, time.UTC)
+
 	if k.isPresent(ctx, a) &&
-		time.Unix(int64(m.Lasttime), 0).Add(k.Limit).UTC().After(time.Unix(mintTime, 0)) {
+		time.Unix(int64(m.Lasttime), 0).After(midnight) {
 		return types.ErrWithdrawTooOften
 	}
 
@@ -109,7 +112,7 @@ func (k Keeper) getMintHistory(ctx sdk.Context, minter sdk.AccAddress) types.Min
 
 	bz := store.Get([]byte(minter))
 	var history types.MintHistory
-	k.cdc.MustUnmarshalBinaryBare(bz, &history)
+	k.cdc.MustUnmarshal(bz, &history)
 	return history
 }
 
@@ -125,7 +128,7 @@ func (k Keeper) setMintHistory(ctx sdk.Context, minter sdk.AccAddress, history t
 	}
 
 	store := ctx.KVStore(k.storeKey)
-	store.Set([]byte(minter), k.cdc.MustMarshalBinaryBare(&history))
+	store.Set([]byte(minter), k.cdc.MustMarshal(&history))
 }
 
 // IsPresent check if the name is present in the store or not

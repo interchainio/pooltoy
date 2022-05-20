@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/interchainberlin/pooltoy/regex"
-	"github.com/interchainberlin/pooltoy/x/faucet/types"
+	"github.com/interchainio/pooltoy/regex"
+	"github.com/interchainio/pooltoy/x/faucet/types"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -44,11 +44,11 @@ func (k Keeper) QueryWhenBrr(c context.Context, req *types.QueryWhenBrrRequest) 
 
 	lastTime := time.Unix(m.Lasttime, 0)
 	currentTime := time.Unix(mintTime, 0)
+	midnight := time.Date(currentTime.Year(), currentTime.Month(), currentTime.Day(), 0, 0, 0, 0, time.Local)
+	isAfterMidnight := lastTime.After(midnight)
 
-	lastTimePlusLimit := lastTime.Add(k.Limit).UTC()
-	isAfter := lastTimePlusLimit.After(currentTime)
-	if isAfter {
-		timeLeft = int64(lastTime.Add(k.Limit).UTC().Sub(currentTime).Seconds())
+	if isAfterMidnight {
+		timeLeft = int64(midnight.AddDate(0, 0, 1).Sub(currentTime).Seconds())
 	} else {
 		timeLeft = 0
 	}

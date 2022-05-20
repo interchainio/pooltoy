@@ -7,7 +7,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/interchainberlin/pooltoy/x/pooltoy/types"
+	"github.com/interchainio/pooltoy/x/pooltoy/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
 
@@ -15,14 +15,14 @@ import (
 
 // Keeper of the pooltoy store
 type Keeper struct {
-	cdc           codec.BinaryMarshaler
+	cdc           codec.Codec
 	storeKey      sdk.StoreKey
 	AccountKeeper authkeeper.AccountKeeper
 }
 
 // NewKeeper creates a pooltoy keeper
 func NewKeeper(
-	cdc codec.BinaryMarshaler,
+	cdc codec.Codec,
 	storeKey sdk.StoreKey,
 	accountKeeper authkeeper.AccountKeeper,
 ) Keeper {
@@ -45,7 +45,7 @@ func (k Keeper) ListAccounts(ctx sdk.Context) []authtypes.AccountI {
 func (k Keeper) InsertUser(ctx sdk.Context, user types.User) error {
 	key := []byte(types.UserPrefix + user.UserAccount)
 
-	u, err := k.cdc.MarshalBinaryBare(&user)
+	u, err := k.cdc.Marshal(&user)
 	if err != nil {
 		return err
 	}
@@ -75,7 +75,7 @@ func (k Keeper) GetUserByAccAddress(ctx sdk.Context, queriedUserAccAddress sdk.A
 	iterator := sdk.KVStorePrefixIterator(store, []byte(types.UserPrefix))
 	for ; iterator.Valid(); iterator.Next() {
 		var user types.User
-		k.cdc.MustUnmarshalBinaryBare(store.Get(iterator.Key()), &user)
+		k.cdc.MustUnmarshal(store.Get(iterator.Key()), &user)
 		if user.UserAccount == queriedUserAccAddress.String() {
 			queriedUser = user
 		}
@@ -89,7 +89,7 @@ func (k Keeper) ListUsers(ctx sdk.Context) []*types.User {
 	iterator := sdk.KVStorePrefixIterator(store, []byte(types.UserPrefix))
 	for ; iterator.Valid(); iterator.Next() {
 		var user types.User
-		k.cdc.MustUnmarshalBinaryBare(store.Get(iterator.Key()), &user)
+		k.cdc.MustUnmarshal(store.Get(iterator.Key()), &user)
 		userList = append(userList, &user)
 	}
 	return userList

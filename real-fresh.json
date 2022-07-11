@@ -1480,12 +1480,7 @@
         },
         {
           "address": "cosmos1jv65s3grqf6v6jl3dp4t6c9t9rk99cd88lyufl",
-          "coins": [
-            {
-              "amount": "5232116",
-              "denom": "stake"
-            }
-          ]
+          "coins": []
         },
         {
           "address": "cosmos1j36lckh24pff9uthslsps83fkn8tel4xxgrxq4",
@@ -5181,5 +5176,5 @@
     "version": {}
   },
   "genesis_time": "2022-07-11T14:12:53.336888Z",
-  "initial_height": "5169657"
+  "initial_height": "5170871"
 }

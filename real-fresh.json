@@ -1480,7 +1480,12 @@
         },
         {
           "address": "cosmos1jv65s3grqf6v6jl3dp4t6c9t9rk99cd88lyufl",
-          "coins": []
+          "coins": [
+            {
+              "amount": "5232116",
+              "denom": "stake"
+            }
+          ]
         },
         {
           "address": "cosmos1j36lckh24pff9uthslsps83fkn8tel4xxgrxq4",
@@ -2571,7 +2576,7 @@
       },
       "supply": [
         {
-          "amount": "101887304",
+          "amount": "107119420",
           "denom": "stake"
         },
         {

@@ -4,6 +4,10 @@
 
 - 08.2021: Adding escrow module to pooltoy
 
+TODO:
+- Rename "response" to "fill"
+- Add optional explicit counterparty to offer message
+
 ## Abstract
 
  This ADR will discuss the design of the escrow module, with the focus on the message types, the escrow process, and data store.
@@ -58,7 +62,7 @@ When the sender sends the `Offer` message to the escrow module, the `Offer.Amoun
 Please note the `Offer.Amount` is bonded token after offering successfully.`Offer.Sender` cannot spend emojis which are at escrow, but `Offer.Sender` can make them unbonded again through `CancelOffer`.
 
 
-### Response (should rename to fill)
+### Response
 
 > Resonser: *"Hi, I have 1🍕, I want those 2🍎!"*
 

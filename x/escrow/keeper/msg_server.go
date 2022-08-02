@@ -61,7 +61,10 @@ func (k Keeper) Response(c context.Context, msg *types.ResponseRequest) (*types.
 	}
 
 	err = k.BankKeeper.SendCoins(ctx, responser, offerer, offer.Request)
-
+	if err != nil {
+		return nil, err
+	}
+	
 	err = k.DeleteOffer(ctx, msg.Id)
 	if err != nil {
 		return nil, err
